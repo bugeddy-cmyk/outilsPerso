@@ -12,7 +12,13 @@ Application web légère : **chrono**, **minuteur** et **compte à rebours**, av
 - **Raccourcis** — Espace (start/pause), L (tour), R (reset), 1/2/3 (changer de mode)
 - **Gestes** — balayage horizontal pour changer de mode sur mobile
 
-## Lancer l'application
+## Accès en ligne (GitHub Pages)
+
+**https://bugeddy-cmyk.github.io/outilsPerso/**
+
+Le chrono s’ouvre directement — c’est l’onglet actif par défaut.
+
+## Lancer en local
 
 ```bash
 # Python
