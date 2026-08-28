@@ -16,7 +16,18 @@ Application web légère : **chrono**, **minuteur** et **compte à rebours**, av
 
 **https://bugeddy-cmyk.github.io/outilsPerso/**
 
+> Le déploiement est configuré via GitHub Actions. Si la page n’est pas encore en ligne, activez Pages une fois (voir ci-dessous).
+
 Le chrono s’ouvre directement — c’est l’onglet actif par défaut.
+
+### Activer GitHub Pages (une seule fois)
+
+1. Ouvrir **Settings → Pages** du dépôt :  
+   https://github.com/bugeddy-cmyk/outilsPerso/settings/pages
+2. Sous **Build and deployment → Source**, choisir **GitHub Actions**
+3. Relancer le workflow **Deploy GitHub Pages** (onglet Actions → Re-run)
+
+> **Note :** le dépôt est privé. GitHub Pages sur un dépôt privé nécessite un plan **GitHub Pro** (ou rendre le dépôt public).
 
 ## Lancer en local
 
