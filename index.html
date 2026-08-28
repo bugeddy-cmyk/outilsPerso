@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a12">
+  <meta name="description" content="Minuteur, chrono et compte à rebours — style liquid glass">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱</text></svg>">
+  <title>Horizon — Minuteur</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="ambient" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <main class="app" role="application">
+    <header class="header glass">
+      <h1 class="logo">Horizon</h1>
+      <button type="button" class="icon-btn" id="themeToggle" aria-label="Changer le thème">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </header>
+
+    <nav class="mode-nav glass" role="tablist" aria-label="Modes du minuteur">
+      <button type="button" class="mode-btn active" role="tab" aria-selected="true" aria-controls="panel-chrono" id="tab-chrono" data-mode="chrono">
+        Chrono
+      </button>
+      <button type="button" class="mode-btn" role="tab" aria-selected="false" aria-controls="panel-minuteur" id="tab-minuteur" data-mode="minuteur">
+        Minuteur
+      </button>
+      <button type="button" class="mode-btn" role="tab" aria-selected="false" aria-controls="panel-countdown" id="tab-countdown" data-mode="countdown">
+        Compte à rebours
+      </button>
+      <span class="mode-indicator" aria-hidden="true"></span>
+    </nav>
+
+    <!-- CHRONO -->
+    <section class="panel active" id="panel-chrono" role="tabpanel" aria-labelledby="tab-chrono">
+      <div class="display glass">
+        <div class="ring-container">
+          <svg class="progress-ring" viewBox="0 0 260 260" aria-hidden="true">
+            <circle class="ring-bg" cx="130" cy="130" r="118"/>
+            <circle class="ring-fill chrono-ring" cx="130" cy="130" r="118"/>
+          </svg>
+          <div class="time-display" id="chronoDisplay" aria-live="polite">00:00.00</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button type="button" class="control-btn secondary" id="chronoLap" disabled aria-label="Marquer un tour">
+          <span>Tour</span>
+        </button>
+        <button type="button" class="control-btn primary" id="chronoStart" aria-label="Démarrer le chrono">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <button type="button" class="control-btn secondary" id="chronoReset" aria-label="Réinitialiser le chrono">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="laps glass" id="lapsPanel">
+        <div class="laps-header">
+          <h2>Tours</h2>
+          <button type="button" class="text-btn" id="clearLaps" aria-label="Effacer tous les tours">Effacer</button>
+        </div>
+        <ul class="laps-list" id="lapsList" aria-label="Liste des temps au tour"></ul>
+        <p class="empty-state" id="lapsEmpty">Aucun tour enregistré</p>
+      </div>
+    </section>
+
+    <!-- MINUTEUR -->
+    <section class="panel" id="panel-minuteur" role="tabpanel" aria-labelledby="tab-minuteur" hidden>
+      <div class="display glass">
+        <div class="ring-container">
+          <svg class="progress-ring" viewBox="0 0 260 260" aria-hidden="true">
+            <circle class="ring-bg" cx="130" cy="130" r="118"/>
+            <circle class="ring-fill minuteur-ring" cx="130" cy="130" r="118"/>
+          </svg>
+          <div class="time-display" id="minuteurDisplay" aria-live="polite">05:00</div>
+        </div>
+      </div>
+
+      <div class="time-picker" id="minuteurPicker">
+        <div class="picker-col">
+          <button type="button" class="picker-btn" data-target="minuteur-h" data-dir="1" aria-label="Augmenter les heures">▲</button>
+          <input type="text" inputmode="numeric" class="picker-value" id="minuteur-h" value="00" maxlength="2" aria-label="Heures">
+          <button type="button" class="picker-btn" data-target="minuteur-h" data-dir="-1" aria-label="Diminuer les heures">▼</button>
+          <span class="picker-label">h</span>
+        </div>
+        <span class="picker-sep">:</span>
+        <div class="picker-col">
+          <button type="button" class="picker-btn" data-target="minuteur-m" data-dir="1" aria-label="Augmenter les minutes">▲</button>
+          <input type="text" inputmode="numeric" class="picker-value" id="minuteur-m" value="05" maxlength="2" aria-label="Minutes">
+          <button type="button" class="picker-btn" data-target="minuteur-m" data-dir="-1" aria-label="Diminuer les minutes">▼</button>
+          <span class="picker-label">min</span>
+        </div>
+        <span class="picker-sep">:</span>
+        <div class="picker-col">
+          <button type="button" class="picker-btn" data-target="minuteur-s" data-dir="1" aria-label="Augmenter les secondes">▲</button>
+          <input type="text" inputmode="numeric" class="picker-value" id="minuteur-s" value="00" maxlength="2" aria-label="Secondes">
+          <button type="button" class="picker-btn" data-target="minuteur-s" data-dir="-1" aria-label="Diminuer les secondes">▼</button>
+          <span class="picker-label">sec</span>
+        </div>
+      </div>
+
+      <div class="presets" role="group" aria-label="Durées rapides">
+        <button type="button" class="preset-btn" data-seconds="60">1 min</button>
+        <button type="button" class="preset-btn" data-seconds="180">3 min</button>
+        <button type="button" class="preset-btn active" data-seconds="300">5 min</button>
+        <button type="button" class="preset-btn" data-seconds="600">10 min</button>
+        <button type="button" class="preset-btn" data-seconds="900">15 min</button>
+        <button type="button" class="preset-btn" data-seconds="1800">30 min</button>
+      </div>
+
+      <div class="controls">
+        <button type="button" class="control-btn secondary" id="minuteurCancel" aria-label="Annuler le minuteur">
+          <span>Annuler</span>
+        </button>
+        <button type="button" class="control-btn primary" id="minuteurStart" aria-label="Démarrer le minuteur">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <button type="button" class="control-btn secondary" id="minuteurReset" aria-label="Réinitialiser le minuteur">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- COMPTE À REBOURS -->
+    <section class="panel" id="panel-countdown" role="tabpanel" aria-labelledby="tab-countdown" hidden>
+      <div class="display glass">
+        <div class="ring-container">
+          <svg class="progress-ring" viewBox="0 0 260 260" aria-hidden="true">
+            <circle class="ring-bg" cx="130" cy="130" r="118"/>
+            <circle class="ring-fill countdown-ring" cx="130" cy="130" r="118"/>
+          </svg>
+          <div class="time-display large" id="countdownDisplay" aria-live="polite">00:00:00</div>
+          <div class="countdown-label" id="countdownLabel">Prêt</div>
+        </div>
+      </div>
+
+      <div class="time-picker" id="countdownPicker">
+        <div class="picker-col">
+          <button type="button" class="picker-btn" data-target="countdown-h" data-dir="1" aria-label="Augmenter les heures">▲</button>
+          <input type="text" inputmode="numeric" class="picker-value" id="countdown-h" value="00" maxlength="2" aria-label="Heures">
+          <button type="button" class="picker-btn" data-target="countdown-h" data-dir="-1" aria-label="Diminuer les heures">▼</button>
+          <span class="picker-label">h</span>
+        </div>
+        <span class="picker-sep">:</span>
+        <div class="picker-col">
+          <button type="button" class="picker-btn" data-target="countdown-m" data-dir="1" aria-label="Augmenter les minutes">▲</button>
+          <input type="text" inputmode="numeric" class="picker-value" id="countdown-m" value="05" maxlength="2" aria-label="Minutes">
+          <button type="button" class="picker-btn" data-target="countdown-m" data-dir="-1" aria-label="Diminuer les minutes">▼</button>
+          <span class="picker-label">min</span>
+        </div>
+        <span class="picker-sep">:</span>
+        <div class="picker-col">
+          <button type="button" class="picker-btn" data-target="countdown-s" data-dir="1" aria-label="Augmenter les secondes">▲</button>
+          <input type="text" inputmode="numeric" class="picker-value" id="countdown-s" value="00" maxlength="2" aria-label="Secondes">
+          <button type="button" class="picker-btn" data-target="countdown-s" data-dir="-1" aria-label="Diminuer les secondes">▼</button>
+          <span class="picker-label">sec</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button type="button" class="control-btn secondary" id="countdownCancel" aria-label="Annuler le compte à rebours">
+          <span>Annuler</span>
+        </button>
+        <button type="button" class="control-btn primary" id="countdownStart" aria-label="Démarrer le compte à rebours">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <button type="button" class="control-btn secondary" id="countdownReset" aria-label="Réinitialiser le compte à rebours">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast glass" id="toast" role="status" aria-live="assertive" hidden></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
