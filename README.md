@@ -22,12 +22,13 @@ Le chrono s’ouvre directement — c’est l’onglet actif par défaut.
 
 ### Activer GitHub Pages (une seule fois)
 
-1. Ouvrir **Settings → Pages** du dépôt :  
+1. Ouvrir **Settings → Pages** :  
    https://github.com/bugeddy-cmyk/outilsPerso/settings/pages
-2. Sous **Build and deployment → Source**, choisir **GitHub Actions**
-3. Relancer le workflow **Deploy GitHub Pages** (onglet Actions → Re-run)
+2. Sous **Build and deployment → Source**, choisir **Deploy from a branch**
+3. Branch : **gh-pages** — dossier : **/ (root)**
+4. Sauvegarder — le déploiement se fait automatiquement à chaque push sur `main`
 
-> **Note :** le dépôt est privé. GitHub Pages sur un dépôt privé nécessite un plan **GitHub Pro** (ou rendre le dépôt public).
+> **Note :** sur un dépôt **privé**, GitHub Pages nécessite **GitHub Pro**. Sinon, rendez le dépôt **public** (Settings → General → Change visibility).
 
 ## Lancer en local
 
