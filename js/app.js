@@ -2,6 +2,7 @@ import { Chrono } from './chrono.js';
 import { Minuteur } from './minuteur.js';
 import { Countdown } from './countdown.js';
 import { getTheme, setTheme } from './storage.js';
+import { initParallax, initMicroAnimations } from './parallax.js';
 
 const modes = ['chrono', 'minuteur', 'countdown'];
 let currentMode = 'chrono';
@@ -109,5 +110,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
 initTheme();
 initModeNav();
 initKeyboard();
+initParallax();
+initMicroAnimations();
 
 export { chrono, minuteur, countdown };

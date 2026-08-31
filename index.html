@@ -11,13 +11,24 @@
 </head>
 <body>
   <div class="ambient" aria-hidden="true">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
+    <div class="parallax-grid"></div>
+    <div class="orb-layer" data-depth="28">
+      <div class="orb orb-1"></div>
+    </div>
+    <div class="orb-layer" data-depth="-18">
+      <div class="orb orb-2"></div>
+    </div>
+    <div class="orb-layer" data-depth="14">
+      <div class="orb orb-3"></div>
+    </div>
+    <div class="orb-layer" data-depth="-10">
+      <div class="orb orb-4"></div>
+    </div>
+    <div class="shimmer-layer" data-depth="6"></div>
   </div>
 
-  <main class="app" role="application">
-    <header class="header glass">
+  <main class="app parallax-content" data-depth="-4" role="application">
+    <header class="header glass float-in" style="--delay:0">
       <h1 class="logo">Horizon</h1>
       <button type="button" class="icon-btn" id="themeToggle" aria-label="Changer le thème">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -30,7 +41,7 @@
       </button>
     </header>
 
-    <nav class="mode-nav glass" role="tablist" aria-label="Modes du minuteur">
+    <nav class="mode-nav glass float-in" style="--delay:1" role="tablist" aria-label="Modes du minuteur">
       <button type="button" class="mode-btn active" role="tab" aria-selected="true" aria-controls="panel-chrono" id="tab-chrono" data-mode="chrono">
         Chrono
       </button>
@@ -45,13 +56,15 @@
 
     <!-- CHRONO -->
     <section class="panel active" id="panel-chrono" role="tabpanel" aria-labelledby="tab-chrono">
-      <div class="display glass">
-        <div class="ring-container">
+      <div class="display glass" data-tilt="5">
+        <div class="ring-container" id="chronoRingContainer">
           <svg class="progress-ring" viewBox="0 0 260 260" aria-hidden="true">
             <circle class="ring-bg" cx="130" cy="130" r="118"/>
             <circle class="ring-fill chrono-ring" cx="130" cy="130" r="118"/>
           </svg>
-          <div class="time-display" id="chronoDisplay" aria-live="polite">00:00.00</div>
+          <div class="time-display chrono-display" id="chronoDisplay" aria-live="polite">
+            <span class="time-main">00:00</span><span class="time-ms">.00</span>
+          </div>
         </div>
       </div>
 
@@ -82,8 +95,8 @@
 
     <!-- MINUTEUR -->
     <section class="panel" id="panel-minuteur" role="tabpanel" aria-labelledby="tab-minuteur" hidden>
-      <div class="display glass">
-        <div class="ring-container">
+      <div class="display glass" data-tilt="5">
+        <div class="ring-container" id="minuteurRingContainer">
           <svg class="progress-ring" viewBox="0 0 260 260" aria-hidden="true">
             <circle class="ring-bg" cx="130" cy="130" r="118"/>
             <circle class="ring-fill minuteur-ring" cx="130" cy="130" r="118"/>
@@ -142,8 +155,8 @@
 
     <!-- COMPTE À REBOURS -->
     <section class="panel" id="panel-countdown" role="tabpanel" aria-labelledby="tab-countdown" hidden>
-      <div class="display glass">
-        <div class="ring-container">
+      <div class="display glass" data-tilt="5">
+        <div class="ring-container" id="countdownRingContainer">
           <svg class="progress-ring" viewBox="0 0 260 260" aria-hidden="true">
             <circle class="ring-bg" cx="130" cy="130" r="118"/>
             <circle class="ring-fill countdown-ring" cx="130" cy="130" r="118"/>
