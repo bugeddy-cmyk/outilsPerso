@@ -3,6 +3,7 @@ import {
   formatTimer, setRingProgress, resetRing, parsePickerValues,
   setPickerValues, playAlert, vibrate, showToast, setPrimaryButtonRunning, now,
 } from './utils.js';
+import { setRunningGlow } from './parallax.js';
 
 export class Minuteur {
   constructor() {
@@ -18,6 +19,7 @@ export class Minuteur {
     this.picker = document.getElementById('minuteurPicker');
     this.presets = document.querySelector('#panel-minuteur .presets');
     this.panel = document.getElementById('panel-minuteur');
+    this.ringContainer = document.getElementById('minuteurRingContainer');
     this.startBtn = document.getElementById('minuteurStart');
     this.cancelBtn = document.getElementById('minuteurCancel');
     this.resetBtn = document.getElementById('minuteurReset');
@@ -92,6 +94,7 @@ export class Minuteur {
     this.startTime = now();
     this.setEditing(false);
     setPrimaryButtonRunning(this.startBtn, true);
+    setRunningGlow(this.ringContainer, true);
     this.tick();
   }
 
@@ -99,6 +102,7 @@ export class Minuteur {
     this.running = false;
     cancelAnimationFrame(this.rafId);
     setPrimaryButtonRunning(this.startBtn, false);
+    setRunningGlow(this.ringContainer, false);
   }
 
   cancel() {
@@ -127,6 +131,7 @@ export class Minuteur {
     this.remaining = 0;
     cancelAnimationFrame(this.rafId);
     setPrimaryButtonRunning(this.startBtn, false);
+    setRunningGlow(this.ringContainer, false);
     this.setEditing(true);
     this.updateDisplay();
     setRingProgress(this.ring, 0, 'success');

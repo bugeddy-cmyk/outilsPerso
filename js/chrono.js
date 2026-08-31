@@ -1,5 +1,6 @@
 import { addLap, getLaps, clearLaps as clearStoredLaps } from './storage.js';
 import { formatChrono, setRingProgress, resetRing, now, setPrimaryButtonRunning } from './utils.js';
+import { setRunningGlow } from './parallax.js';
 
 export class Chrono {
   constructor() {
@@ -8,9 +9,11 @@ export class Chrono {
     this.startTime = 0;
     this.rafId = null;
     this.lastLapTotal = 0;
+    this.lastCs = -1;
 
     this.display = document.getElementById('chronoDisplay');
     this.ring = document.querySelector('.chrono-ring');
+    this.ringContainer = document.getElementById('chronoRingContainer');
     this.startBtn = document.getElementById('chronoStart');
     this.lapBtn = document.getElementById('chronoLap');
     this.resetBtn = document.getElementById('chronoReset');
@@ -38,6 +41,7 @@ export class Chrono {
     this.startTime = now() - this.elapsed;
     this.lapBtn.disabled = false;
     setPrimaryButtonRunning(this.startBtn, true);
+    setRunningGlow(this.ringContainer, true);
     this.tick();
   }
 
@@ -45,6 +49,7 @@ export class Chrono {
     this.running = false;
     cancelAnimationFrame(this.rafId);
     setPrimaryButtonRunning(this.startBtn, false);
+    setRunningGlow(this.ringContainer, false);
   }
 
   reset() {
@@ -52,8 +57,10 @@ export class Chrono {
     this.elapsed = 0;
     this.lastLapTotal = 0;
     this.lapBtn.disabled = true;
+    this.lastCs = -1;
     this.updateDisplay();
     resetRing(this.ring);
+    setRunningGlow(this.ringContainer, false);
   }
 
   lap() {
@@ -86,7 +93,24 @@ export class Chrono {
   }
 
   updateDisplay() {
-    if (this.display) this.display.textContent = formatChrono(this.elapsed);
+    if (!this.display) return;
+    const formatted = formatChrono(this.elapsed);
+    const dot = formatted.indexOf('.');
+    const main = dot > -1 ? formatted.slice(0, dot) : formatted;
+    const ms = dot > -1 ? formatted.slice(dot) : '';
+
+    const mainEl = this.display.querySelector('.time-main');
+    const msEl = this.display.querySelector('.time-ms');
+    if (mainEl) mainEl.textContent = main;
+    if (msEl) msEl.textContent = ms;
+
+    const cs = Math.floor((this.elapsed % 1000) / 10);
+    if (cs !== this.lastCs) {
+      this.lastCs = cs;
+      this.display.classList.remove('tick');
+      void this.display.offsetWidth;
+      this.display.classList.add('tick');
+    }
   }
 
   renderLaps() {

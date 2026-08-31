@@ -3,6 +3,7 @@ import {
   formatCountdown, setRingProgress, resetRing, parsePickerValues,
   setPickerValues, playAlert, vibrate, showToast, setPrimaryButtonRunning, now,
 } from './utils.js';
+import { setRunningGlow } from './parallax.js';
 
 export class Countdown {
   constructor() {
@@ -18,6 +19,7 @@ export class Countdown {
     this.ring = document.querySelector('.countdown-ring');
     this.picker = document.getElementById('countdownPicker');
     this.panel = document.getElementById('panel-countdown');
+    this.ringContainer = document.getElementById('countdownRingContainer');
     this.startBtn = document.getElementById('countdownStart');
     this.cancelBtn = document.getElementById('countdownCancel');
     this.resetBtn = document.getElementById('countdownReset');
@@ -76,6 +78,7 @@ export class Countdown {
     this.setEditing(false);
     setPrimaryButtonRunning(this.startBtn, true);
     if (this.label) this.label.textContent = 'En cours';
+    setRunningGlow(this.ringContainer, true);
     this.tick();
   }
 
@@ -83,6 +86,7 @@ export class Countdown {
     this.running = false;
     cancelAnimationFrame(this.rafId);
     setPrimaryButtonRunning(this.startBtn, false);
+    setRunningGlow(this.ringContainer, false);
     if (this.label) this.label.textContent = 'En pause';
   }
 
@@ -114,6 +118,7 @@ export class Countdown {
     this.remaining = 0;
     cancelAnimationFrame(this.rafId);
     setPrimaryButtonRunning(this.startBtn, false);
+    setRunningGlow(this.ringContainer, false);
     this.setEditing(true);
     this.updateDisplay();
     setRingProgress(this.ring, 0, 'success');
