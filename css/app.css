@@ -986,6 +986,75 @@ input:focus-visible {
 
 .alarms-list:not(:empty) + .empty-state { display: none; }
 
+/* ── Overlay alarme sonnerie ── */
+.alarm-ring-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 24px;
+  animation: fadeIn 0.3s var(--ease-out);
+}
+
+.alarm-ring-overlay[hidden] { display: none; }
+
+.alarm-ring-card {
+  text-align: center;
+  padding: 36px 32px;
+  border-radius: var(--radius-lg);
+  max-width: 320px;
+  width: 100%;
+  animation: ringCardPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes ringCardPulse {
+  0%, 100% { box-shadow: inset 0 1px 0 var(--glass-highlight), 0 8px 32px var(--glass-shadow), 0 0 0 0 rgba(255, 159, 10, 0.4); }
+  50% { box-shadow: inset 0 1px 0 var(--glass-highlight), 0 8px 32px var(--glass-shadow), 0 0 0 12px rgba(255, 159, 10, 0); }
+}
+
+.alarm-ring-icon {
+  font-size: 3rem;
+  margin-bottom: 8px;
+  animation: ringIconShake 0.5s ease-in-out infinite;
+}
+
+@keyframes ringIconShake {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
+}
+
+.alarm-ring-heading {
+  font-size: 1.375rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.alarm-ring-time {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  color: var(--accent-warm);
+  margin-bottom: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+.alarm-ring-stop {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: var(--accent-danger);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 4px 20px rgba(255, 69, 58, 0.45);
+  transition: transform 0.2s var(--spring);
+}
+
+.alarm-ring-stop:active { transform: scale(0.97); }
+
 /* ── Toast ── */
 .toast {
   position: fixed;

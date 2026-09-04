@@ -87,6 +87,84 @@ export function playAlert() {
   } catch { /* audio unavailable */ }
 }
 
+let alarmSession = null;
+
+/** Sonnerie d'alarme insistante (distincte du minuteur). */
+export function playAlarmSound() {
+  stopAlarmSound();
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const master = ctx.createGain();
+    master.gain.value = 0.55;
+    master.connect(ctx.destination);
+
+    const oscillators = [];
+    let cycleTimer = null;
+    let stopped = false;
+
+    function ringCycle(startTime) {
+      if (stopped) return;
+      const pairs = [
+        [880, 0],
+        [880, 0.22],
+        [0, 0.28],
+        [988, 0.38],
+        [988, 0.6],
+        [0, 0.68],
+        [784, 0.78],
+        [784, 1.0],
+        [0, 1.08],
+        [1046, 1.18],
+        [1046, 1.42],
+      ];
+      pairs.forEach(([freq, offset]) => {
+        if (freq === 0) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.value = freq;
+        osc.connect(gain);
+        gain.connect(master);
+        const t = startTime + offset;
+        gain.gain.setValueAtTime(0.001, t);
+        gain.gain.exponentialRampToValueAtTime(0.35, t + 0.02);
+        gain.gain.setValueAtTime(0.35, t + 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+        osc.start(t);
+        osc.stop(t + 0.2);
+        oscillators.push(osc);
+      });
+    }
+
+    const loop = () => {
+      if (stopped) return;
+      ringCycle(ctx.currentTime);
+      cycleTimer = setTimeout(loop, 1600);
+    };
+    loop();
+
+    alarmSession = {
+      stop() {
+        if (stopped) return;
+        stopped = true;
+        clearTimeout(cycleTimer);
+        oscillators.forEach(o => { try { o.stop(); } catch { /* already stopped */ } });
+        master.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+        setTimeout(() => ctx.close().catch(() => {}), 200);
+        alarmSession = null;
+      },
+    };
+    return alarmSession;
+  } catch {
+    return null;
+  }
+}
+
+export function stopAlarmSound() {
+  alarmSession?.stop();
+  alarmSession = null;
+}
+
 export function vibrate(pattern = [200, 100, 200]) {
   if ('vibrate' in navigator) navigator.vibrate(pattern);
 }

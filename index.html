@@ -8,11 +8,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱</text></svg>">
   <title>Horizon — Minuteur</title>
-<<<<<<< HEAD
-  <link rel="stylesheet" href="css/app.css?v=2">
-=======
-  <link rel="stylesheet" href="css/app.css?v=3">
->>>>>>> cursor/alarme-no-scroll-a56e
+  <link rel="stylesheet" href="css/app.css?v=4">
 </head>
 <body>
   <div class="ambient" aria-hidden="true">
@@ -231,7 +227,7 @@
         <button type="button" class="text-btn" id="notifEnable">Autoriser</button>
       </div>
 
-      <form class="alarm-form glass" id="alarmForm" onsubmit="return false">
+      <div class="alarm-form glass" id="alarmForm">
         <h2 class="form-title">Nouvelle alarme</h2>
         <label class="field">
           <span class="field-label">Titre</span>
@@ -251,7 +247,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
           Ajouter l'alarme
         </button>
-      </form>
+      </div>
 
       <div class="alarms-panel glass">
         <div class="laps-header">
@@ -263,12 +259,17 @@
     </section>
   </main>
 
+  <div class="alarm-ring-overlay" id="alarmRingOverlay" hidden role="alertdialog" aria-modal="true" aria-labelledby="alarmRingTitle">
+    <div class="alarm-ring-card glass">
+      <div class="alarm-ring-icon" aria-hidden="true">⏰</div>
+      <h2 class="alarm-ring-heading" id="alarmRingTitle">Alarme</h2>
+      <p class="alarm-ring-time" id="alarmRingTime">00:00</p>
+      <button type="button" class="alarm-ring-stop" id="alarmRingStop">Arrêter</button>
+    </div>
+  </div>
+
   <div class="toast glass" id="toast" role="status" aria-live="assertive" hidden></div>
 
-<<<<<<< HEAD
-  <script type="module" src="js/app.js?v=2"></script>
-=======
-  <script type="module" src="js/app.js?v=3"></script>
->>>>>>> cursor/alarme-no-scroll-a56e
+  <script type="module" src="js/app.js?v=4"></script>
 </body>
 </html>

@@ -74,9 +74,9 @@ export function saveAlarms(alarms) {
 }
 
 export function addAlarm(alarm) {
-  const alarms = getAlarms();
-  alarms.push(alarm);
-  saveAlarms(alarms.slice(0, 50));
+  const current = loadState();
+  const alarms = [...(current.alarms ?? []), alarm].slice(0, 50);
+  saveState({ alarms });
   return alarms;
 }
 
