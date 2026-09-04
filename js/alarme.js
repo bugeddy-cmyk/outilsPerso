@@ -2,8 +2,8 @@ import {
   getAlarms, addAlarm, updateAlarm, deleteAlarm,
 } from './storage.js';
 import {
-  playAlert, vibrate, showToast, requestNotificationPermission,
-  showBrowserNotification, pad,
+  playAlarmSound, stopAlarmSound, vibrate, showToast,
+  requestNotificationPermission, showBrowserNotification, pad,
 } from './utils.js';
 
 export class Alarme {
@@ -14,11 +14,20 @@ export class Alarme {
     this.timeInput = document.getElementById('alarmTime');
     this.repeatInput = document.getElementById('alarmRepeat');
     this.addBtn = document.getElementById('alarmAdd');
+    this.formEl = document.getElementById('alarmForm');
     this.notifBanner = document.getElementById('notifBanner');
     this.notifBtn = document.getElementById('notifEnable');
     this.nextDisplay = document.getElementById('alarmNextDisplay');
     this.nextLabel = document.getElementById('alarmNextLabel');
     this.clockDisplay = document.getElementById('alarmClockDisplay');
+    this.ringOverlay = document.getElementById('alarmRingOverlay');
+    this.ringTitle = document.getElementById('alarmRingTitle');
+    this.ringTime = document.getElementById('alarmRingTime');
+    this.ringStopBtn = document.getElementById('alarmRingStop');
+
+    this._eventsBound = false;
+    this._addLock = false;
+    this._firingAlarmId = null;
 
     this.bindEvents();
     this.render();
@@ -36,11 +45,23 @@ export class Alarme {
   }
 
   bindEvents() {
-    this.addBtn?.addEventListener('click', () => this.handleAdd());
-    this.titleInput?.addEventListener('keydown', e => {
-      if (e.key === 'Enter') this.handleAdd();
+    if (this._eventsBound) return;
+    this._eventsBound = true;
+
+    const onAdd = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.handleAdd();
+    };
+
+    this.addBtn?.addEventListener('click', onAdd);
+    this.formEl?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.matches('input:not([type=checkbox])')) {
+        onAdd(e);
+      }
     });
     this.notifBtn?.addEventListener('click', () => this.enableNotifications());
+    this.ringStopBtn?.addEventListener('click', () => this.dismissRing());
   }
 
   async enableNotifications() {
@@ -62,13 +83,27 @@ export class Alarme {
   }
 
   handleAdd() {
+    if (this._addLock) return;
+    this._addLock = true;
+    setTimeout(() => { this._addLock = false; }, 500);
+
     const title = (this.titleInput?.value || '').trim() || 'Alarme';
     const timeVal = this.timeInput?.value;
     if (!timeVal) {
       showToast('Choisissez une heure');
+      this._addLock = false;
       return;
     }
     const [h, m] = timeVal.split(':').map(Number);
+
+    const duplicate = getAlarms().some(
+      a => a.title === title && a.hour === h && a.minute === m && a.enabled
+    );
+    if (duplicate) {
+      showToast('Cette alarme existe déjà');
+      return;
+    }
+
     addAlarm({
       id: crypto.randomUUID(),
       title,
@@ -79,6 +114,7 @@ export class Alarme {
       lastFiredKey: null,
       createdAt: Date.now(),
     });
+
     if (this.titleInput) this.titleInput.value = '';
     this.render();
     this.updateNextAlarm();
@@ -113,20 +149,36 @@ export class Alarme {
   }
 
   fire(alarm, firedKey) {
+    if (this._firingAlarmId === alarm.id) return;
+    this._firingAlarmId = alarm.id;
+
     const timeStr = `${pad(alarm.hour)}:${pad(alarm.minute)}`;
     updateAlarm(alarm.id, {
       lastFiredKey: firedKey,
       enabled: alarm.repeatDaily ? true : false,
     });
 
-    playAlert();
-    vibrate([300, 100, 300, 100, 300, 100, 300]);
+    playAlarmSound();
+    vibrate([400, 150, 400, 150, 400, 150, 400]);
     showBrowserNotification(alarm.title, `Il est ${timeStr}`, alarm.id);
     showToast(`⏰ ${alarm.title} — ${timeStr}`);
     document.title = `⏰ ${alarm.title} — Horizon`;
-    setTimeout(() => { document.title = 'Horizon — Minuteur'; }, 8000);
+
+    if (this.ringOverlay) {
+      this.ringOverlay.hidden = false;
+      if (this.ringTitle) this.ringTitle.textContent = alarm.title;
+      if (this.ringTime) this.ringTime.textContent = timeStr;
+    }
 
     this.render();
+  }
+
+  dismissRing() {
+    stopAlarmSound();
+    if ('vibrate' in navigator) navigator.vibrate(0);
+    this._firingAlarmId = null;
+    if (this.ringOverlay) this.ringOverlay.hidden = true;
+    document.title = 'Horizon — Minuteur';
   }
 
   updateClock() {
@@ -189,7 +241,7 @@ export class Alarme {
       const li = document.createElement('li');
       li.className = `alarm-item${alarm.enabled ? '' : ' disabled'}`;
       li.innerHTML = `
-        <button type="button" class="alarm-toggle${alarm.enabled ? ' on' : ''}" aria-label="${alarm.enabled ? 'Désactiver' : 'Activer'} ${alarm.title}" data-id="${alarm.id}">
+        <button type="button" class="alarm-toggle${alarm.enabled ? ' on' : ''}" aria-label="${alarm.enabled ? 'Désactiver' : 'Activer'} ${escapeHtml(alarm.title)}" data-id="${alarm.id}">
           <span class="toggle-knob"></span>
         </button>
         <div class="alarm-info">
@@ -197,7 +249,7 @@ export class Alarme {
           <span class="alarm-meta">${alarm.repeatDaily ? 'Quotidienne' : 'Unique'} · ${pad(alarm.hour)}:${pad(alarm.minute)}</span>
         </div>
         <span class="alarm-time">${pad(alarm.hour)}:${pad(alarm.minute)}</span>
-        <button type="button" class="alarm-delete" aria-label="Supprimer ${alarm.title}" data-id="${alarm.id}">
+        <button type="button" class="alarm-delete" aria-label="Supprimer ${escapeHtml(alarm.title)}" data-id="${alarm.id}">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       `;
