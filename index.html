@@ -8,7 +8,11 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱</text></svg>">
   <title>Horizon — Minuteur</title>
+<<<<<<< HEAD
   <link rel="stylesheet" href="css/app.css?v=2">
+=======
+  <link rel="stylesheet" href="css/app.css?v=3">
+>>>>>>> cursor/alarme-no-scroll-a56e
 </head>
 <body>
   <div class="ambient" aria-hidden="true">
@@ -50,7 +54,10 @@
         Minuteur
       </button>
       <button type="button" class="mode-btn" role="tab" aria-selected="false" aria-controls="panel-countdown" id="tab-countdown" data-mode="countdown">
-        Compte à rebours
+        Rebours
+      </button>
+      <button type="button" class="mode-btn" role="tab" aria-selected="false" aria-controls="panel-alarme" id="tab-alarme" data-mode="alarme">
+        Alarme
       </button>
       <span class="mode-indicator" aria-hidden="true"></span>
     </nav>
@@ -205,10 +212,63 @@
         </button>
       </div>
     </section>
+
+    <!-- ALARME -->
+    <section class="panel" id="panel-alarme" role="tabpanel" aria-labelledby="tab-alarme" hidden>
+      <div class="display glass alarm-display" data-tilt="4">
+        <div class="alarm-clock-wrap">
+          <div class="time-display alarm-clock" id="alarmClockDisplay" aria-live="polite">00:00:00</div>
+          <div class="alarm-next">
+            <span class="alarm-next-label">Prochaine</span>
+            <span class="alarm-next-time" id="alarmNextDisplay">--:--</span>
+            <span class="alarm-next-title" id="alarmNextLabel">Aucune alarme active</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="notif-banner glass" id="notifBanner" hidden>
+        <p>Activez les notifications pour recevoir une alerte sur le bureau.</p>
+        <button type="button" class="text-btn" id="notifEnable">Autoriser</button>
+      </div>
+
+      <form class="alarm-form glass" id="alarmForm" onsubmit="return false">
+        <h2 class="form-title">Nouvelle alarme</h2>
+        <label class="field">
+          <span class="field-label">Titre</span>
+          <input type="text" class="field-input" id="alarmTitle" placeholder="Réveil, médicament…" maxlength="40" autocomplete="off">
+        </label>
+        <div class="field-row">
+          <label class="field">
+            <span class="field-label">Heure</span>
+            <input type="time" class="field-input" id="alarmTime" value="07:00" required>
+          </label>
+          <label class="field field-check">
+            <input type="checkbox" id="alarmRepeat" checked>
+            <span class="check-label">Tous les jours</span>
+          </label>
+        </div>
+        <button type="button" class="add-alarm-btn" id="alarmAdd">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          Ajouter l'alarme
+        </button>
+      </form>
+
+      <div class="alarms-panel glass">
+        <div class="laps-header">
+          <h2>Mes alarmes</h2>
+        </div>
+        <ul class="alarms-list" id="alarmsList" aria-label="Liste des alarmes"></ul>
+        <p class="empty-state" id="alarmsEmpty">Aucune alarme programmée</p>
+      </div>
+    </section>
   </main>
 
   <div class="toast glass" id="toast" role="status" aria-live="assertive" hidden></div>
 
+<<<<<<< HEAD
   <script type="module" src="js/app.js?v=2"></script>
+=======
+  <script type="module" src="js/app.js?v=3"></script>
+>>>>>>> cursor/alarme-no-scroll-a56e
 </body>
 </html>

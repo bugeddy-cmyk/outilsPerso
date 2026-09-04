@@ -45,15 +45,15 @@ export function initParallax() {
 
     layers.forEach(el => {
       const depth = parseFloat(el.dataset.depth) || 1;
-      const x = currentX * depth;
-      const y = currentY * depth;
+      const x = Math.max(-30, Math.min(30, currentX * depth * 0.6));
+      const y = Math.max(-24, Math.min(24, currentY * depth * 0.6));
       el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
     });
 
     tilts.forEach(el => {
       const max = parseFloat(el.dataset.tilt) || 6;
-      const rx = -currentY * max;
-      const ry = currentX * max;
+      const rx = Math.max(-max, Math.min(max, -currentY * max));
+      const ry = Math.max(-max, Math.min(max, currentX * max));
       el.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;
     });
 

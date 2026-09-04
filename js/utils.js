@@ -27,6 +27,8 @@ function pad(n) {
   return String(n).padStart(2, '0');
 }
 
+export { pad };
+
 export function setRingProgress(ringEl, progress, className = '') {
   if (!ringEl) return;
   const offset = RING_C * (1 - Math.min(1, Math.max(0, progress)));
@@ -114,4 +116,30 @@ export function setPrimaryButtonRunning(btn, running) {
 
 export function now() {
   return performance.now();
+}
+
+export async function requestNotificationPermission() {
+  if (!('Notification' in window)) return 'unsupported';
+  if (Notification.permission === 'granted') return 'granted';
+  if (Notification.permission === 'denied') return 'denied';
+  return Notification.requestPermission();
+}
+
+export function showBrowserNotification(title, body, tag = 'horizon-alarm') {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return null;
+  try {
+    const n = new Notification(title, {
+      body,
+      icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏰</text></svg>",
+      tag: `horizon-${tag}`,
+      requireInteraction: true,
+    });
+    n.onclick = () => {
+      window.focus();
+      n.close();
+    };
+    return n;
+  } catch {
+    return null;
+  }
 }
