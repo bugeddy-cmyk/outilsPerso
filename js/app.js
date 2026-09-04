@@ -1,17 +1,19 @@
 import { Chrono } from './chrono.js';
 import { Minuteur } from './minuteur.js';
 import { Countdown } from './countdown.js';
+import { Alarme } from './alarme.js';
 import { getTheme, setTheme } from './storage.js';
 import { initParallax, initMicroAnimations } from './parallax.js';
 
-const modes = ['chrono', 'minuteur', 'countdown'];
+const modes = ['chrono', 'minuteur', 'countdown', 'alarme'];
 let currentMode = 'chrono';
 
 const chrono = new Chrono();
 const minuteur = new Minuteur();
 const countdown = new Countdown();
+const alarme = new Alarme();
 
-const instances = { chrono, minuteur, countdown };
+const instances = { chrono, minuteur, countdown, alarme };
 
 function initTheme() {
   const saved = getTheme();
@@ -43,7 +45,6 @@ function initModeNav() {
     tab.addEventListener('click', () => switchMode(tab.dataset.mode, index));
   });
 
-  /* Swipe between modes on touch devices */
   let touchStartX = 0;
   const app = document.querySelector('.app');
   app?.addEventListener('touchstart', e => {
@@ -91,7 +92,7 @@ function initKeyboard() {
       e.preventDefault();
       if (currentMode === 'chrono') chrono.toggle();
       else if (currentMode === 'minuteur') minuteur.toggle();
-      else countdown.toggle();
+      else if (currentMode === 'countdown') countdown.toggle();
     }
 
     if (e.code === 'KeyL' && currentMode === 'chrono') chrono.lap();
@@ -100,6 +101,7 @@ function initKeyboard() {
     if (e.code === 'Digit1') switchMode('chrono', 0);
     if (e.code === 'Digit2') switchMode('minuteur', 1);
     if (e.code === 'Digit3') switchMode('countdown', 2);
+    if (e.code === 'Digit4') switchMode('alarme', 3);
   });
 }
 
@@ -113,4 +115,4 @@ initKeyboard();
 initParallax();
 initMicroAnimations();
 
-export { chrono, minuteur, countdown };
+export { chrono, minuteur, countdown, alarme };
