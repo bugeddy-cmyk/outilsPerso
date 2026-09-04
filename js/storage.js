@@ -22,6 +22,7 @@ function getDefaults() {
     chronoLaps: [],
     minuteurDuration: 300,
     countdownDuration: 300,
+    alarms: [],
   };
 }
 
@@ -62,4 +63,29 @@ export function getMinuteurDuration() {
 
 export function getCountdownDuration() {
   return loadState().countdownDuration ?? 300;
+}
+
+export function getAlarms() {
+  return loadState().alarms ?? [];
+}
+
+export function saveAlarms(alarms) {
+  saveState({ alarms });
+}
+
+export function addAlarm(alarm) {
+  const alarms = getAlarms();
+  alarms.push(alarm);
+  saveAlarms(alarms.slice(0, 50));
+  return alarms;
+}
+
+export function updateAlarm(id, partial) {
+  const alarms = getAlarms().map(a => (a.id === id ? { ...a, ...partial } : a));
+  saveAlarms(alarms);
+  return alarms;
+}
+
+export function deleteAlarm(id) {
+  saveAlarms(getAlarms().filter(a => a.id !== id));
 }
