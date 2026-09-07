@@ -165,6 +165,61 @@ export function stopAlarmSound() {
   alarmSession = null;
 }
 
+/* ── Flash blanc doux (style iOS) ── */
+let flashLoopTimer = null;
+let flashPulseTimer = null;
+
+function getFlashEl() {
+  let el = document.getElementById('screenFlash');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'screenFlash';
+    el.className = 'screen-flash';
+    el.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(el);
+  }
+  return el;
+}
+
+export function pulseSoftFlash() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const el = getFlashEl();
+  el.classList.remove('active');
+  void el.offsetWidth;
+  el.classList.add('active');
+}
+
+/** Plusieurs flashs synchronisés à la fin d'un minuteur/rebours. */
+export function playSoftFlash(repeats = 3, intervalMs = 1100) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  stopSoftFlashLoop();
+  let count = 0;
+  const run = () => {
+    pulseSoftFlash();
+    count += 1;
+    if (count < repeats) {
+      flashPulseTimer = setTimeout(run, intervalMs);
+    }
+  };
+  run();
+}
+
+/** Flash en boucle tant que l'alarme sonne. */
+export function startSoftFlashLoop(intervalMs = 1600) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  stopSoftFlashLoop();
+  pulseSoftFlash();
+  flashLoopTimer = setInterval(pulseSoftFlash, intervalMs);
+}
+
+export function stopSoftFlashLoop() {
+  clearInterval(flashLoopTimer);
+  clearTimeout(flashPulseTimer);
+  flashLoopTimer = null;
+  flashPulseTimer = null;
+  document.getElementById('screenFlash')?.classList.remove('active');
+}
+
 export function vibrate(pattern = [200, 100, 200]) {
   if ('vibrate' in navigator) navigator.vibrate(pattern);
 }

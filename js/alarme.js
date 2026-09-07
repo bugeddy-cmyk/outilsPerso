@@ -2,8 +2,8 @@ import {
   getAlarms, addAlarm, updateAlarm, deleteAlarm,
 } from './storage.js';
 import {
-  playAlarmSound, stopAlarmSound, vibrate, showToast,
-  requestNotificationPermission, showBrowserNotification, pad,
+  playAlarmSound, stopAlarmSound, startSoftFlashLoop, stopSoftFlashLoop,
+  vibrate, showToast, requestNotificationPermission, showBrowserNotification, pad,
 } from './utils.js';
 
 export class Alarme {
@@ -159,6 +159,7 @@ export class Alarme {
     });
 
     playAlarmSound();
+    startSoftFlashLoop(1600);
     vibrate([400, 150, 400, 150, 400, 150, 400]);
     showBrowserNotification(alarm.title, `Il est ${timeStr}`, alarm.id);
     showToast(`⏰ ${alarm.title} — ${timeStr}`);
@@ -175,6 +176,7 @@ export class Alarme {
 
   dismissRing() {
     stopAlarmSound();
+    stopSoftFlashLoop();
     if ('vibrate' in navigator) navigator.vibrate(0);
     this._firingAlarmId = null;
     if (this.ringOverlay) this.ringOverlay.hidden = true;

@@ -1,7 +1,7 @@
 import { getMinuteurDuration, saveMinuteurDuration } from './storage.js';
 import {
   formatTimer, setRingProgress, resetRing, parsePickerValues,
-  setPickerValues, playAlert, vibrate, showToast, setPrimaryButtonRunning, now,
+  setPickerValues, playAlert, playSoftFlash, vibrate, showToast, setPrimaryButtonRunning, now,
 } from './utils.js';
 import { setRunningGlow } from './parallax.js';
 
@@ -137,6 +137,7 @@ export class Minuteur {
     setRingProgress(this.ring, 0, 'success');
     this.panel?.classList.add('finished');
     playAlert();
+    playSoftFlash(3, 1100);
     vibrate();
     showToast('Minuteur terminé !');
     document.title = '⏰ Minuteur terminé — Horizon';

@@ -1055,6 +1055,51 @@ input:focus-visible {
 
 .alarm-ring-stop:active { transform: scale(0.97); }
 
+/* ── Flash blanc plein écran (style iOS) ── */
+.screen-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  pointer-events: none;
+  background: #fff;
+  opacity: 0;
+  mix-blend-mode: normal;
+}
+
+.screen-flash.active {
+  animation: iosSoftFlash 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes iosSoftFlash {
+  0% {
+    opacity: 0;
+  }
+  6% {
+    opacity: 0.82;
+  }
+  18% {
+    opacity: 0.55;
+  }
+  45% {
+    opacity: 0.22;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+[data-theme="light"] .screen-flash.active {
+  animation-name: iosSoftFlashLight;
+}
+
+@keyframes iosSoftFlashLight {
+  0% { opacity: 0; }
+  6% { opacity: 0.65; }
+  18% { opacity: 0.38; }
+  45% { opacity: 0.14; }
+  100% { opacity: 0; }
+}
+
 /* ── Toast ── */
 .toast {
   position: fixed;
@@ -1109,7 +1154,10 @@ input:focus-visible {
   .shimmer-layer,
   .parallax-grid,
   .parallax-content,
-  [data-tilt] {
+  [data-tilt],
+  .screen-flash.active {
     transform: none !important;
+    animation: none !important;
+    opacity: 0 !important;
   }
 }
