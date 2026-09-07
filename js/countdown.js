@@ -1,7 +1,7 @@
 import { getCountdownDuration, saveCountdownDuration } from './storage.js';
 import {
   formatCountdown, setRingProgress, resetRing, parsePickerValues,
-  setPickerValues, playAlert, vibrate, showToast, setPrimaryButtonRunning, now,
+  setPickerValues, playAlert, playSoftFlash, vibrate, showToast, setPrimaryButtonRunning, now,
 } from './utils.js';
 import { setRunningGlow } from './parallax.js';
 
@@ -125,6 +125,7 @@ export class Countdown {
     this.panel?.classList.add('finished');
     if (this.label) this.label.textContent = 'Terminé !';
     playAlert();
+    playSoftFlash(3, 1100);
     vibrate([300, 100, 300, 100, 300]);
     showToast('Compte à rebours terminé !');
     document.title = '⏰ Terminé — Horizon';
