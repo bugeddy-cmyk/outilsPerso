@@ -29,15 +29,15 @@ export const EFFORT_LABELS = {
 };
 
 export const ENERGY_LEVELS = [
-  { id: 'low', label: 'Énergie basse' },
-  { id: 'medium', label: 'Énergie moyenne' },
-  { id: 'high', label: 'Énergie haute' },
+  { id: 'low', label: 'Énergie basse', tone: 'red' },
+  { id: 'medium', label: 'Énergie moyenne', tone: 'orange' },
+  { id: 'high', label: 'Énergie haute', tone: 'green' },
 ];
 
 export const FOCUS_LEVELS = [
-  { id: 'hard', label: 'Difficile de me concentrer' },
-  { id: 'medium', label: 'Concentration moyenne' },
-  { id: 'good', label: 'Bonne concentration' },
+  { id: 'hard', label: 'Difficile de me concentrer', tone: 'red' },
+  { id: 'medium', label: 'Concentration moyenne', tone: 'orange' },
+  { id: 'good', label: 'Bonne concentration', tone: 'green' },
 ];
 
 const COMPAT_MATRIX = {
