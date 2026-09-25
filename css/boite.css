@@ -26,6 +26,15 @@
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", system-ui, sans-serif;
   --sidebar-w: 260px;
   --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --tone-red: #e5484d;
+  --tone-red-bg: rgba(229, 72, 77, 0.14);
+  --tone-red-border: rgba(229, 72, 77, 0.45);
+  --tone-orange: #e86a00;
+  --tone-orange-bg: rgba(232, 106, 0, 0.14);
+  --tone-orange-border: rgba(232, 106, 0, 0.45);
+  --tone-green: #30a14e;
+  --tone-green-bg: rgba(48, 161, 78, 0.14);
+  --tone-green-border: rgba(48, 161, 78, 0.45);
 }
 
 [data-theme="dark"] {
@@ -48,6 +57,15 @@
   --violet-soft: rgba(94, 92, 230, 0.15);
   --violet-text: #bf5af2;
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --tone-red: #ff6961;
+  --tone-red-bg: rgba(255, 105, 97, 0.22);
+  --tone-red-border: rgba(255, 105, 97, 0.55);
+  --tone-orange: #ffb340;
+  --tone-orange-bg: rgba(255, 179, 64, 0.2);
+  --tone-orange-border: rgba(255, 179, 64, 0.5);
+  --tone-green: #3ddc84;
+  --tone-green-bg: rgba(61, 220, 132, 0.18);
+  --tone-green-border: rgba(61, 220, 132, 0.5);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -616,21 +634,63 @@ textarea:focus-visible {
 }
 
 .mood-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   text-align: left;
-  padding: 10px 12px;
+  padding: 10px 12px 10px 10px;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--surface-2);
   font-size: 0.875rem;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.mood-opt::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--mood-tone, var(--text-tertiary));
+  box-shadow: 0 0 0 2px var(--surface-2);
 }
 
 .mood-opt:hover { border-color: var(--border-strong); }
 
-.mood-opt.active {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  color: var(--text);
+.mood-opt.mood-tone-red {
+  --mood-tone: var(--tone-red);
+  border-left: 3px solid var(--tone-red-border);
+}
+
+.mood-opt.mood-tone-orange {
+  --mood-tone: var(--tone-orange);
+  border-left: 3px solid var(--tone-orange-border);
+}
+
+.mood-opt.mood-tone-green {
+  --mood-tone: var(--tone-green);
+  border-left: 3px solid var(--tone-green-border);
+}
+
+.mood-opt.mood-tone-red.active {
+  background: var(--tone-red-bg);
+  border-color: var(--tone-red-border);
+  box-shadow: inset 0 0 0 1px var(--tone-red-border);
+  font-weight: 600;
+}
+
+.mood-opt.mood-tone-orange.active {
+  background: var(--tone-orange-bg);
+  border-color: var(--tone-orange-border);
+  box-shadow: inset 0 0 0 1px var(--tone-orange-border);
+  font-weight: 600;
+}
+
+.mood-opt.mood-tone-green.active {
+  background: var(--tone-green-bg);
+  border-color: var(--tone-green-border);
+  box-shadow: inset 0 0 0 1px var(--tone-green-border);
   font-weight: 600;
 }
 

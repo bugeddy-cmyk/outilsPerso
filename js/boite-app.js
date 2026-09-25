@@ -217,7 +217,7 @@ class BoiteApp {
     ENERGY_LEVELS.forEach(level => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'mood-opt';
+      btn.className = `mood-opt mood-tone-${level.tone}`;
       btn.dataset.energy = level.id;
       btn.textContent = level.label;
       btn.addEventListener('click', () => {
@@ -231,7 +231,7 @@ class BoiteApp {
     FOCUS_LEVELS.forEach(level => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'mood-opt';
+      btn.className = `mood-opt mood-tone-${level.tone}`;
       btn.dataset.focus = level.id;
       btn.textContent = level.label;
       btn.addEventListener('click', () => {
