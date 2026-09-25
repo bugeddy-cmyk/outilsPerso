@@ -8,6 +8,7 @@
  */
 
 import { PHRASES_EXTRA } from './phrases-data-extra.js';
+import { PHRASES_EXTRA_2 } from './phrases-data-extra2.js';
 
 const PHRASES_BASE = [
   {
@@ -466,7 +467,7 @@ const PHRASES_BASE = [
   },
 ];
 
-export const PHRASES = [...PHRASES_BASE, ...PHRASES_EXTRA];
+export const PHRASES = [...PHRASES_BASE, ...PHRASES_EXTRA, ...PHRASES_EXTRA_2];
 
 export const CATEGORY_LABELS = {
   motivation: 'Motivation',
