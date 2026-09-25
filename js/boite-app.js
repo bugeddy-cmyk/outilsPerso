@@ -52,9 +52,7 @@ class BoiteApp {
   }
 
   bindNav() {
-    document.querySelectorAll('[data-view]').forEach(el => {
-      if (el.closest('#inboxStatusFilters')) return;
-      if (!el.classList.contains('nav-item') && !el.classList.contains('tabbar-btn')) return;
+    document.querySelectorAll('.nav-item, .tabbar-btn').forEach(el => {
       el.addEventListener('click', () => this.setView(el.dataset.view));
     });
   }
@@ -182,8 +180,7 @@ class BoiteApp {
       return;
     }
     if (['todo', 'keepIdea', 'archive'].includes(action)) {
-      const map = { todo: 'todo', keepIdea: 'idea', archive: 'archived' };
-      this.applyStatus(id, action === 'keepIdea' ? 'keepIdea' : action === 'todo' ? 'todo' : 'archive');
+      this.applyStatus(id, action);
     }
   }
 
@@ -360,7 +357,7 @@ class BoiteApp {
       <article class="item-card" data-id="${item.id}" role="listitem">
         <header class="item-card-head">
           <span class="badge badge-${item.status}">${STATUS_LABELS[item.status]}</span>
-          <span class="badge badge-archived">${KIND_LABELS[item.kind] || item.kind}</span>
+          <span class="badge badge-kind">${KIND_LABELS[item.kind] || item.kind}</span>
         </header>
         <h3 class="item-card-title">${escapeHtml(item.title)}</h3>
         ${item.details ? `<p class="item-card-details">${escapeHtml(item.details)}</p>` : ''}
