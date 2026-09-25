@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0a0a12">
-  <meta name="description" content="Minuteur, chrono et compte à rebours — style liquid glass">
+  <meta name="description" content="Capture d'idées, boîte de réception et minuteur — style liquid glass">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱</text></svg>">
   <title>Horizon — Minuteur</title>
-  <link rel="stylesheet" href="css/app.css?v=5">
+  <link rel="stylesheet" href="css/app.css?v=8">
 </head>
 <body>
   <div class="ambient" aria-hidden="true">
@@ -31,7 +31,11 @@
   <main class="app parallax-content" data-depth="-4" role="application">
     <header class="header glass float-in" style="--delay:0">
       <h1 class="logo">Horizon</h1>
-      <button type="button" class="icon-btn" id="themeToggle" aria-label="Changer le thème">
+      <div class="header-actions">
+        <button type="button" class="header-link-btn header-link-btn--accent" id="openPersoBtn" aria-label="Ouvrir la boîte à idées : capture et tri">
+          Boîte à idées
+        </button>
+        <button type="button" class="icon-btn" id="themeToggle" aria-label="Changer le thème">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
           <circle cx="12" cy="12" r="4"/>
           <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
@@ -39,10 +43,14 @@
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
         </svg>
-      </button>
+        </button>
+      </div>
     </header>
 
-    <nav class="mode-nav glass float-in" style="--delay:1" role="tablist" aria-label="Modes du minuteur">
+    <nav class="mode-nav glass float-in" style="--delay:1" role="tablist" aria-label="Modes de l'application" data-count="5">
+      <button type="button" class="mode-btn" role="tab" aria-selected="false" aria-controls="panel-perso" id="tab-perso" data-mode="perso" title="Capture et boîte de réception">
+        Boîte
+      </button>
       <button type="button" class="mode-btn active" role="tab" aria-selected="true" aria-controls="panel-chrono" id="tab-chrono" data-mode="chrono">
         Chrono
       </button>
@@ -57,6 +65,142 @@
       </button>
       <span class="mode-indicator" aria-hidden="true"></span>
     </nav>
+
+    <div class="perso-entry glass float-in" id="persoEntry" style="--delay:2">
+      <div class="perso-entry-text">
+        <p class="perso-entry-title">Boîte à idées</p>
+        <p class="perso-entry-hint">Capture une pensée — tu pourras la trier plus tard</p>
+        <a href="#" class="perso-entry-link" id="persoEntryLink">Voir la boîte de réception</a>
+      </div>
+      <button type="button" class="perso-entry-btn" id="persoEntryBtn">Ouvrir</button>
+    </div>
+
+    <!-- OUTIL PERSO -->
+    <section class="panel" id="panel-perso" role="tabpanel" aria-labelledby="tab-perso" hidden>
+      <nav class="perso-nav glass" id="persoNav" role="tablist" aria-label="Vues personnelles" data-active="0">
+        <button type="button" class="perso-tab active" role="tab" aria-selected="true" data-perso-view="capture" id="perso-tab-capture">Capture</button>
+        <button type="button" class="perso-tab" role="tab" aria-selected="false" data-perso-view="boite" id="perso-tab-boite">Boîte</button>
+        <button type="button" class="perso-tab" role="tab" aria-selected="false" data-perso-view="maintenant" id="perso-tab-maintenant">Maintenant</button>
+        <span class="perso-indicator" aria-hidden="true"></span>
+      </nav>
+
+      <div class="perso-view active" data-perso-view="capture" id="perso-view-capture" role="tabpanel" aria-labelledby="perso-tab-capture">
+        <div class="capture-hero glass">
+          <p class="capture-lead">Capture une idée avant de l'oublier</p>
+          <p class="capture-hint">Tu pourras la trier plus tard</p>
+        </div>
+
+        <form class="capture-form glass" id="captureForm">
+          <label class="field">
+            <span class="field-label">Qu'as-tu en tête ?</span>
+            <input type="text" class="field-input capture-input" id="captureTitle" placeholder="Tâche, idée, rappel…" maxlength="280" autocomplete="off" required>
+          </label>
+          <button type="button" class="text-btn capture-toggle" id="captureDetailsToggle" aria-expanded="false" aria-controls="captureExtras">
+            Détails facultatifs
+          </button>
+          <div class="capture-extras" id="captureExtras" hidden>
+            <label class="field">
+              <span class="field-label">Type</span>
+              <select class="field-input" id="captureKind">
+                <option value="other">Autre</option>
+                <option value="idea">Idée</option>
+                <option value="task">Tâche</option>
+                <option value="reminder">Rappel</option>
+                <option value="note">Note</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="field-label">Détails</span>
+              <textarea class="field-input field-textarea" id="captureDetails" rows="2" maxlength="2000" placeholder="Contexte, liens…"></textarea>
+            </label>
+            <div class="field-row">
+              <label class="field">
+                <span class="field-label">Date éventuelle</span>
+                <input type="date" class="field-input" id="captureDue">
+              </label>
+              <label class="field">
+                <span class="field-label">Projet / catégorie</span>
+                <input type="text" class="field-input" id="captureCategory" maxlength="60" autocomplete="off">
+              </label>
+            </div>
+            <label class="field">
+              <span class="field-label">Effort (facultatif)</span>
+              <select class="field-input" id="captureEffort">
+                <option value="unknown">Effort inconnu</option>
+                <option value="quick">Rapide / mécanique</option>
+                <option value="focus">Demande de la concentration</option>
+                <option value="creative">Créatif</option>
+                <option value="admin">Pratique / administratif</option>
+              </select>
+            </label>
+          </div>
+          <button type="submit" class="add-alarm-btn capture-submit">Enregistrer</button>
+        </form>
+
+        <div class="recent-panel glass">
+          <div class="laps-header">
+            <h2>Récemment capturé</h2>
+          </div>
+          <ul class="inbox-list compact-list" id="captureRecentList" aria-label="Captures récentes"></ul>
+          <p class="empty-state" id="captureRecentEmpty">Rien pour l'instant — le champ ci-dessus suffit</p>
+        </div>
+      </div>
+
+      <div class="perso-view" data-perso-view="boite" id="perso-view-boite" role="tabpanel" aria-labelledby="perso-tab-boite" hidden>
+        <label class="field inbox-search-field">
+          <span class="field-label">Recherche</span>
+          <input type="search" class="field-input" id="inboxSearch" placeholder="Filtrer par mot-clé…" autocomplete="off">
+        </label>
+        <div class="filter-chips" id="inboxStatusFilters" role="group" aria-label="Filtrer par statut">
+          <button type="button" class="filter-chip active" data-status="inbox">À trier</button>
+          <button type="button" class="filter-chip" data-status="todo">À faire</button>
+          <button type="button" class="filter-chip" data-status="idea">Idées</button>
+          <button type="button" class="filter-chip" data-status="scheduled">Planifiés</button>
+          <button type="button" class="filter-chip" data-status="archived">Archivés</button>
+          <button type="button" class="filter-chip" data-status="all">Tout</button>
+        </div>
+        <div class="inbox-scroll glass">
+          <ul class="inbox-list" id="inboxList" aria-label="Boîte de réception"></ul>
+          <p class="empty-state" id="inboxEmpty">Rien à trier pour le moment</p>
+        </div>
+      </div>
+
+      <div class="perso-view" data-perso-view="maintenant" id="perso-view-maintenant" role="tabpanel" aria-labelledby="perso-tab-maintenant" hidden>
+        <div class="now-intro glass">
+          <p class="capture-lead">Qu'est-ce qui te semble faisable maintenant ?</p>
+          <p class="capture-hint">Indication personnelle — tu peux aussi ne rien choisir</p>
+        </div>
+
+        <div class="mood-panel glass">
+          <h2 class="form-title">Ton énergie</h2>
+          <div class="chip-group" id="energyGroup" role="group" aria-label="Niveau d'énergie"></div>
+          <h2 class="form-title mood-second">Ta concentration</h2>
+          <div class="chip-group" id="focusGroup" role="group" aria-label="Niveau de concentration"></div>
+          <label class="field field-check highlight-check">
+            <input type="checkbox" id="highlightCompat" checked>
+            <span class="check-label">Mettre en avant les éléments compatibles (sans masquer le reste dans la boîte)</span>
+          </label>
+        </div>
+
+        <div class="suggest-card glass" id="suggestCard" hidden>
+          <p class="suggest-label">Une proposition parmi d'autres</p>
+          <p class="suggest-title" id="suggestTitle"></p>
+          <p class="suggest-meta" id="suggestMeta"></p>
+          <div class="suggest-actions">
+            <button type="button" class="text-btn" id="suggestAnother">Autre suggestion</button>
+            <button type="button" class="preset-btn" id="suggestOpen">Voir / modifier</button>
+          </div>
+        </div>
+
+        <div class="now-list-panel glass">
+          <div class="laps-header">
+            <h2>Éléments compatibles</h2>
+          </div>
+          <ul class="inbox-list compact-list" id="nowList"></ul>
+          <p class="empty-state" id="nowEmpty">Rien de pressant ici — tu peux aussi ne rien choisir</p>
+        </div>
+      </div>
+    </section>
 
     <!-- CHRONO -->
     <section class="panel active" id="panel-chrono" role="tabpanel" aria-labelledby="tab-chrono">
@@ -272,6 +416,69 @@
 
   <div class="toast glass" id="toast" role="status" aria-live="assertive" hidden></div>
 
-  <script type="module" src="js/app.js?v=5"></script>
+  <div class="item-edit-overlay" id="itemEditDialog" hidden role="dialog" aria-modal="true" aria-labelledby="editDialogTitle">
+    <form class="item-edit-card glass" id="itemEditForm">
+      <div class="laps-header">
+        <h2 id="editDialogTitle">Modifier l'élément</h2>
+        <button type="button" class="text-btn" id="editClose" aria-label="Fermer">Fermer</button>
+      </div>
+      <label class="field">
+        <span class="field-label">Titre</span>
+        <input type="text" class="field-input" id="editTitle" required maxlength="280">
+      </label>
+      <div class="field-row">
+        <label class="field">
+          <span class="field-label">Type</span>
+          <select class="field-input" id="editKind">
+            <option value="other">Autre</option>
+            <option value="idea">Idée</option>
+            <option value="task">Tâche</option>
+            <option value="reminder">Rappel</option>
+            <option value="note">Note</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field-label">Statut</span>
+          <select class="field-input" id="editStatus">
+            <option value="inbox">À trier</option>
+            <option value="todo">À faire</option>
+            <option value="idea">Idée gardée</option>
+            <option value="scheduled">Planifié</option>
+            <option value="archived">Archivé</option>
+          </select>
+        </label>
+      </div>
+      <label class="field">
+        <span class="field-label">Effort</span>
+        <select class="field-input" id="editEffort">
+          <option value="unknown">Effort inconnu</option>
+          <option value="quick">Rapide / mécanique</option>
+          <option value="focus">Concentration</option>
+          <option value="creative">Créatif</option>
+          <option value="admin">Pratique / admin</option>
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label">Détails</span>
+        <textarea class="field-input field-textarea" id="editDetails" rows="3" maxlength="2000"></textarea>
+      </label>
+      <div class="field-row">
+        <label class="field">
+          <span class="field-label">Date</span>
+          <input type="date" class="field-input" id="editDue">
+        </label>
+        <label class="field">
+          <span class="field-label">Catégorie</span>
+          <input type="text" class="field-input" id="editCategory" maxlength="60">
+        </label>
+      </div>
+      <div class="edit-actions">
+        <button type="button" class="control-btn secondary edit-cancel" id="editCancel">Annuler</button>
+        <button type="submit" class="add-alarm-btn">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+
+  <script type="module" src="js/app.js?v=8"></script>
 </body>
 </html>
