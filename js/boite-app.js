@@ -15,6 +15,15 @@ import {
 } from './perso-storage.js';
 import { showToast } from './boite-toast.js';
 import { initBoiteTheme } from './boite-theme.js';
+import {
+  STATUS_TONE,
+  KIND_TONE,
+  EFFORT_TONE,
+  VIEW_TONE,
+  FILTER_TONE,
+} from './boite-colors.js';
+
+const TONE_NAMES = ['red', 'orange', 'yellow', 'green', 'teal', 'blue', 'indigo', 'purple', 'pink', 'gray'];
 
 const VIEW_COPY = {
   capture: {
@@ -39,6 +48,7 @@ class BoiteApp {
     this.editingId = null;
 
     initBoiteTheme();
+    this.initToneUi();
     this.bindNav();
     this.bindCapture();
     this.bindInbox();
@@ -51,6 +61,40 @@ class BoiteApp {
     } else {
       this.setView('capture');
     }
+  }
+
+  initToneUi() {
+    document.querySelectorAll('.nav-item, .tabbar-btn').forEach(btn => {
+      const tone = VIEW_TONE[btn.dataset.view];
+      if (tone) btn.classList.add(`tone-${tone}`);
+    });
+
+    document.querySelectorAll('#inboxStatusFilters .segment').forEach(seg => {
+      const tone = FILTER_TONE[seg.dataset.status];
+      if (tone) seg.classList.add(`tone-${tone}`);
+    });
+
+    this.bindColoredSelect('captureKind', KIND_TONE, 'captureKindField');
+    this.bindColoredSelect('captureEffort', EFFORT_TONE, 'captureEffortField');
+    this.bindColoredSelect('editKind', KIND_TONE);
+    this.bindColoredSelect('editStatus', STATUS_TONE);
+    this.bindColoredSelect('editEffort', EFFORT_TONE);
+  }
+
+  bindColoredSelect(selectId, toneMap, fieldId) {
+    const select = document.getElementById(selectId);
+    const field = fieldId
+      ? document.getElementById(fieldId)
+      : select?.closest('.mac-field');
+    if (!select || !field) return;
+
+    const apply = () => {
+      TONE_NAMES.forEach(t => field.classList.remove(`field-tone-${t}`));
+      const tone = toneMap[select.value] || 'gray';
+      field.classList.add(`field-tone-${tone}`);
+    };
+    select.addEventListener('change', apply);
+    apply();
   }
 
   bindNav() {
@@ -79,6 +123,12 @@ class BoiteApp {
     if (titleEl) titleEl.textContent = copy.title;
     if (subEl) subEl.textContent = copy.subtitle;
     document.title = `${copy.title} — Boîte à idées`;
+
+    const toolbar = document.querySelector('.desk-toolbar');
+    if (toolbar) {
+      TONE_NAMES.forEach(t => toolbar.classList.remove(`toolbar-tone-${t}`));
+      toolbar.classList.add(`toolbar-tone-${VIEW_TONE[view]}`);
+    }
 
     if (view === 'boite') this.renderInbox();
     if (view === 'maintenant') this.renderNow();
@@ -311,6 +361,9 @@ class BoiteApp {
     document.getElementById('editDetails').value = item.details || '';
     document.getElementById('editDue').value = item.dueDate || '';
     document.getElementById('editCategory').value = item.category || '';
+    document.getElementById('editKind').dispatchEvent(new Event('change'));
+    document.getElementById('editStatus').dispatchEvent(new Event('change'));
+    document.getElementById('editEffort').dispatchEvent(new Event('change'));
     this.dialog.showModal();
     document.getElementById('editTitle')?.focus();
   }
@@ -331,8 +384,9 @@ class BoiteApp {
     if (!list) return;
     const recent = getInboxItems().slice(0, 8);
     list.innerHTML = recent.map(item => `
-      <li>
-        <span class="badge badge-${item.status}">${STATUS_LABELS[item.status]}</span>
+      <li class="list-row tone-row-${STATUS_TONE[item.status]}">
+        ${statusBadge(item.status)}
+        ${kindBadge(item.kind)}
         <span class="list-row-title">${escapeHtml(item.title)}</span>
       </li>
     `).join('');
@@ -355,17 +409,19 @@ class BoiteApp {
   }
 
   cardHtml(item) {
+    const st = STATUS_TONE[item.status];
     return `
-      <article class="item-card" data-id="${item.id}" role="listitem">
+      <article class="item-card accent-tone tone-${st}" data-id="${item.id}" role="listitem">
         <header class="item-card-head">
-          <span class="badge badge-${item.status}">${STATUS_LABELS[item.status]}</span>
-          <span class="badge badge-kind">${KIND_LABELS[item.kind] || item.kind}</span>
+          ${statusBadge(item.status)}
+          ${kindBadge(item.kind)}
+          ${effortBadge(item.effort)}
         </header>
         <h3 class="item-card-title">${escapeHtml(item.title)}</h3>
         ${item.details ? `<p class="item-card-details">${escapeHtml(item.details)}</p>` : ''}
-        <p class="item-card-meta">${metaLine(item)}</p>
+        <div class="item-card-meta">${metaHtml(item)}</div>
         <footer class="item-card-foot">
-          <select class="mac-input triage-select" data-triage aria-label="Classer ${escapeHtml(item.title)}">
+          <select class="mac-input triage-select tone-${st}" data-triage aria-label="Classer ${escapeHtml(item.title)}">
             <option value="">Classer…</option>
             <option value="keepInbox">Garder en boîte</option>
             <option value="todo">À faire</option>
@@ -374,10 +430,10 @@ class BoiteApp {
             <option value="archive">Archiver</option>
           </select>
           <div class="item-card-actions">
-            <button type="button" class="mac-btn mac-btn-secondary mac-btn-sm" data-action="todo">À faire</button>
-            <button type="button" class="mac-btn mac-btn-secondary mac-btn-sm" data-action="keepIdea">Idée</button>
-            <button type="button" class="mac-btn mac-btn-secondary mac-btn-sm" data-action="edit">Modifier</button>
-            <button type="button" class="mac-btn mac-btn-secondary mac-btn-sm" data-action="delete">Supprimer</button>
+            <button type="button" class="mac-btn mac-btn-sm btn-tone-green" data-action="todo">À faire</button>
+            <button type="button" class="mac-btn mac-btn-sm btn-tone-orange" data-action="keepIdea">Idée</button>
+            <button type="button" class="mac-btn mac-btn-sm btn-tone-blue" data-action="edit">Modifier</button>
+            <button type="button" class="mac-btn mac-btn-sm btn-tone-red" data-action="delete">Supprimer</button>
           </div>
         </footer>
       </article>
@@ -397,8 +453,9 @@ class BoiteApp {
     const nowList = document.getElementById('nowList');
     if (nowList) {
       nowList.innerHTML = list.slice(0, 16).map(item => `
-        <li data-open-item="${item.id}">
-          <span class="badge badge-${item.status}">${STATUS_LABELS[item.status]}</span>
+        <li class="tone-row-${STATUS_TONE[item.status]}" data-open-item="${item.id}">
+          ${statusBadge(item.status)}
+          ${kindBadge(item.kind)}
           <span class="list-row-title">${escapeHtml(item.title)}</span>
           <span class="list-row-meta">${metaLine(item)}</span>
         </li>
@@ -426,9 +483,39 @@ class BoiteApp {
     }
     card.hidden = false;
     card.dataset.itemId = item.id;
+    TONE_NAMES.forEach(t => card.classList.remove(`tone-${t}`));
+    card.classList.add(`tone-${STATUS_TONE[item.status]}`);
     document.getElementById('suggestTitle').textContent = item.title;
     document.getElementById('suggestMeta').textContent = metaLine(item);
   }
+}
+
+function statusBadge(status) {
+  const tone = STATUS_TONE[status] || 'gray';
+  return `<span class="badge mac-tag tone-${tone}">${STATUS_LABELS[status]}</span>`;
+}
+
+function kindBadge(kind) {
+  const tone = KIND_TONE[kind] || 'gray';
+  return `<span class="badge mac-tag tone-${tone}">${KIND_LABELS[kind] || kind}</span>`;
+}
+
+function effortBadge(effort) {
+  if (!effort || effort === 'unknown') return '';
+  const tone = EFFORT_TONE[effort] || 'gray';
+  return `<span class="badge mac-tag tone-${tone}">${EFFORT_LABELS[effort]}</span>`;
+}
+
+function metaHtml(item) {
+  const chips = [];
+  if (item.category) {
+    chips.push(`<span class="meta-chip tone-teal">${escapeHtml(item.category)}</span>`);
+  }
+  if (item.dueDate) {
+    chips.push(`<span class="meta-chip tone-purple">${escapeHtml(item.dueDate)}</span>`);
+  }
+  if (!chips.length) return '<span class="meta-plain">Sans détail supplémentaire</span>';
+  return `<div class="meta-chips">${chips.join('')}</div>`;
 }
 
 function metaLine(item) {

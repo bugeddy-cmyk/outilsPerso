@@ -8,7 +8,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
   <title>Boîte à idées</title>
-  <link rel="stylesheet" href="css/boite.css?v=3">
+  <link rel="stylesheet" href="css/boite.css?v=4">
   <script>
     (function () {
       try {
@@ -72,7 +72,7 @@
         <!-- CAPTURE -->
         <section class="view-panel active" id="view-capture" data-view="capture">
           <div class="capture-layout">
-            <form class="capture-card" id="captureForm">
+            <form class="capture-card accent-tone tone-blue" id="captureForm">
               <label class="mac-field capture-field">
                 <span class="mac-label">Qu'as-tu en tête ?</span>
                 <input type="text" class="mac-input capture-hero-input" id="captureTitle" placeholder="Une phrase suffit…" maxlength="280" autocomplete="off" required>
@@ -81,9 +81,9 @@
               <details class="capture-details" id="captureDetailsBlock">
                 <summary>Détails facultatifs</summary>
                 <div class="details-grid">
-                  <label class="mac-field">
-                    <span class="mac-label">Type</span>
-                    <select class="mac-input" id="captureKind">
+                  <label class="mac-field field-tone" id="captureKindField">
+                    <span class="mac-label mac-label-tag">Type</span>
+                    <select class="mac-input mac-select-tone" id="captureKind">
                       <option value="other">Autre</option>
                       <option value="idea">Idée</option>
                       <option value="task">Tâche</option>
@@ -91,9 +91,9 @@
                       <option value="note">Note</option>
                     </select>
                   </label>
-                  <label class="mac-field">
-                    <span class="mac-label">Effort</span>
-                    <select class="mac-input" id="captureEffort">
+                  <label class="mac-field field-tone" id="captureEffortField">
+                    <span class="mac-label mac-label-tag">Effort</span>
+                    <select class="mac-input mac-select-tone" id="captureEffort">
                       <option value="unknown">Inconnu</option>
                       <option value="quick">Rapide</option>
                       <option value="focus">Concentration</option>
@@ -257,6 +257,6 @@
 
   <div class="boite-toast" id="boiteToast" role="status" aria-live="polite" hidden></div>
 
-  <script type="module" src="js/boite-app.js?v=3"></script>
+  <script type="module" src="js/boite-app.js?v=4"></script>
 </body>
 </html>
