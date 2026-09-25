@@ -6,6 +6,7 @@ import {
   toggleFavorite,
   isFavorite,
   clearSeenHistory,
+  savePhrasesProgress,
 } from './phrases-storage.js';
 import {
   pickRandomPhrase,
@@ -25,8 +26,23 @@ class PhrasesApp {
 
     initBoiteTheme();
     this.bindShell();
+    this.sanitizeProgress();
     this.restoreOrPick();
     this.setView('phrase');
+  }
+
+  sanitizeProgress() {
+    const valid = new Set(this.phrases.map(p => p.id));
+    const progress = getPhrasesProgress();
+    const seenIds = progress.seenIds.filter(id => valid.has(id));
+    const patch = {};
+    if (seenIds.length !== progress.seenIds.length) patch.seenIds = seenIds;
+    if (progress.lastPhraseId && !valid.has(progress.lastPhraseId)) patch.lastPhraseId = null;
+    if (progress.favoriteIds?.length) {
+      const favoriteIds = progress.favoriteIds.filter(id => valid.has(id));
+      if (favoriteIds.length !== progress.favoriteIds.length) patch.favoriteIds = favoriteIds;
+    }
+    if (Object.keys(patch).length) savePhrasesProgress(patch);
   }
 
   bindShell() {
@@ -69,8 +85,9 @@ class PhrasesApp {
 
   restoreOrPick() {
     if (!this.phrases.length) {
+      const title = document.querySelector('#exhaustedState h2');
+      if (title) title.textContent = 'Aucune phrase dans la collection';
       this.showExhausted();
-      document.querySelector('#exhaustedState h2')?.textContent = 'Aucune phrase dans la collection';
       return;
     }
     const { lastPhraseId, seenIds } = getPhrasesProgress();
@@ -212,18 +229,22 @@ class PhrasesApp {
   }
 
   showExhausted() {
-    document.getElementById('phraseCard')?.hidden = true;
-    document.getElementById('phraseEmpty')?.hidden = true;
+    const card = document.getElementById('phraseCard');
+    const empty = document.getElementById('phraseEmpty');
+    const newBtn = document.getElementById('newPhraseBtn');
+    if (card) card.hidden = true;
+    if (empty) empty.hidden = true;
     const box = document.getElementById('exhaustedState');
     if (box) box.hidden = false;
-    document.getElementById('newPhraseBtn')?.disabled = true;
+    if (newBtn) newBtn.disabled = true;
     const { total } = getProgressCounts(this.phrases, getPhrasesProgress().seenIds);
     const prog = document.getElementById('phraseProgress');
     if (prog) prog.textContent = `${total} / ${total} vues`;
   }
 
   hideExhausted() {
-    document.getElementById('exhaustedState')?.hidden = true;
+    const box = document.getElementById('exhaustedState');
+    if (box) box.hidden = true;
   }
 
   toggleCurrentFavorite() {
