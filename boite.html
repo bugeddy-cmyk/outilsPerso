@@ -8,7 +8,22 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
   <title>Boîte à idées</title>
-  <link rel="stylesheet" href="css/boite.css?v=1">
+  <link rel="stylesheet" href="css/boite.css?v=2">
+  <script>
+    (function () {
+      try {
+        var raw = localStorage.getItem('horizon-timer');
+        var pref = raw ? JSON.parse(raw).theme : 'auto';
+        var resolved = pref;
+        if (resolved === 'auto') {
+          resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.dataset.theme = resolved;
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.content = resolved === 'dark' ? '#1e1e1e' : '#ebebf0';
+      } catch (e) { document.documentElement.dataset.theme = 'light'; }
+    })();
+  </script>
 </head>
 <body>
   <div class="desk-app" id="deskApp">
@@ -39,6 +54,17 @@
         <div class="toolbar-titles">
           <h1 class="toolbar-title" id="viewTitle">Capture</h1>
           <p class="toolbar-subtitle" id="viewSubtitle">Capture une idée avant de l'oublier</p>
+        </div>
+        <div class="toolbar-actions">
+          <button type="button" class="theme-toggle" id="themeToggle" aria-label="Passer en mode clair ou sombre">
+            <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+            </svg>
+            <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -231,6 +257,6 @@
 
   <div class="boite-toast" id="boiteToast" role="status" aria-live="polite" hidden></div>
 
-  <script type="module" src="js/boite-app.js?v=1"></script>
+  <script type="module" src="js/boite-app.js?v=2"></script>
 </body>
 </html>
