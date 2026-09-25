@@ -23,6 +23,12 @@ function getDefaults() {
     minuteurDuration: 300,
     countdownDuration: 300,
     alarms: [],
+    inboxItems: [],
+    persoPrefs: {
+      energy: 'medium',
+      focus: 'medium',
+      highlightCompat: true,
+    },
   };
 }
 
