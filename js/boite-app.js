@@ -14,6 +14,7 @@ import {
   FOCUS_LEVELS,
 } from './perso-storage.js';
 import { showToast } from './boite-toast.js';
+import { initBoiteTheme } from './boite-theme.js';
 
 const VIEW_COPY = {
   capture: {
@@ -37,6 +38,7 @@ class BoiteApp {
     this.inboxSearch = '';
     this.editingId = null;
 
+    initBoiteTheme();
     this.bindNav();
     this.bindCapture();
     this.bindInbox();
