@@ -2,20 +2,18 @@ import { Chrono } from './chrono.js';
 import { Minuteur } from './minuteur.js';
 import { Countdown } from './countdown.js';
 import { Alarme } from './alarme.js';
-import { Perso } from './perso.js';
 import { getTheme, setTheme } from './storage.js';
 import { initParallax, initMicroAnimations } from './parallax.js';
 
-const modes = ['perso', 'chrono', 'minuteur', 'countdown', 'alarme'];
+const modes = ['chrono', 'minuteur', 'countdown', 'alarme'];
 let currentMode = 'chrono';
 
 const chrono = new Chrono();
 const minuteur = new Minuteur();
 const countdown = new Countdown();
 const alarme = new Alarme();
-const perso = new Perso();
 
-const instances = { perso, chrono, minuteur, countdown, alarme };
+const instances = { chrono, minuteur, countdown, alarme };
 
 function initTheme() {
   const saved = getTheme();
@@ -42,12 +40,6 @@ function applyTheme(preference) {
 function initModeNav() {
   const nav = document.querySelector('.mode-nav');
   const tabs = nav?.querySelectorAll('.mode-btn');
-  if (nav) {
-    const startIdx = modes.indexOf(currentMode);
-    nav.dataset.count = String(modes.length);
-    nav.dataset.active = String(startIdx);
-    updateModeIndicator(nav, startIdx);
-  }
 
   tabs?.forEach((tab, index) => {
     tab.addEventListener('click', () => switchMode(tab.dataset.mode, index));
@@ -68,19 +60,14 @@ function initModeNav() {
   }, { passive: true });
 }
 
-function switchMode(mode, index, { force = false } = {}) {
-  if (mode === currentMode && !force) return;
+function switchMode(mode, index) {
+  if (mode === currentMode) return;
 
-  if (mode !== currentMode) {
-    instances[currentMode]?.onModeLeave?.();
-    currentMode = mode;
-  }
+  instances[currentMode]?.onModeLeave?.();
+  currentMode = mode;
 
   const nav = document.querySelector('.mode-nav');
-  if (nav) {
-    nav.dataset.active = String(index);
-    updateModeIndicator(nav, index);
-  }
+  if (nav) nav.dataset.active = String(index);
 
   document.querySelectorAll('.mode-btn').forEach((btn, i) => {
     const active = i === index;
@@ -95,56 +82,11 @@ function switchMode(mode, index, { force = false } = {}) {
   });
 
   instances[mode]?.onModeEnter?.();
-  updateHeaderNav();
-}
-
-function openPersoInterface(subView = 'capture') {
-  switchMode('perso', modes.indexOf('perso'));
-  perso?.switchSubView?.(subView);
-}
-
-function returnToTimer() {
-  switchMode('chrono', modes.indexOf('chrono'));
-}
-
-function initHeaderNav() {
-  document.getElementById('openPersoBtn')?.addEventListener('click', () => {
-    if (currentMode === 'perso') returnToTimer();
-    else openPersoInterface('capture');
-  });
-
-  document.getElementById('persoEntryBtn')?.addEventListener('click', () => {
-    openPersoInterface('capture');
-  });
-
-  document.getElementById('persoEntryLink')?.addEventListener('click', e => {
-    e.preventDefault();
-    openPersoInterface('boite');
-  });
-
-  updateHeaderNav();
-}
-
-function updateHeaderNav() {
-  const onPerso = currentMode === 'perso';
-  const entry = document.getElementById('persoEntry');
-  if (entry) entry.hidden = onPerso;
-
-  const btn = document.getElementById('openPersoBtn');
-  if (!btn) return;
-  btn.textContent = onPerso ? 'Minuteur' : 'Boîte à idées';
-  btn.classList.toggle('header-link-btn--accent', !onPerso);
-  btn.setAttribute(
-    'aria-label',
-    onPerso
-      ? 'Revenir au chrono et aux modes minuteur'
-      : 'Ouvrir la boîte à idées : capture et tri',
-  );
 }
 
 function initKeyboard() {
   document.addEventListener('keydown', e => {
-    if (e.target.matches('input, textarea, select')) return;
+    if (e.target.matches('input')) return;
 
     if (e.code === 'Space') {
       e.preventDefault();
@@ -156,11 +98,10 @@ function initKeyboard() {
     if (e.code === 'KeyL' && currentMode === 'chrono') chrono.lap();
     if (e.code === 'KeyR') instances[currentMode]?.reset?.();
 
-    if (e.code === 'Digit1') switchMode('perso', 0);
-    if (e.code === 'Digit2') switchMode('chrono', 1);
-    if (e.code === 'Digit3') switchMode('minuteur', 2);
-    if (e.code === 'Digit4') switchMode('countdown', 3);
-    if (e.code === 'Digit5') switchMode('alarme', 4);
+    if (e.code === 'Digit1') switchMode('chrono', 0);
+    if (e.code === 'Digit2') switchMode('minuteur', 1);
+    if (e.code === 'Digit3') switchMode('countdown', 2);
+    if (e.code === 'Digit4') switchMode('alarme', 3);
   });
 }
 
@@ -170,17 +111,8 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
 
 initTheme();
 initModeNav();
-initHeaderNav();
 initKeyboard();
 initParallax();
 initMicroAnimations();
 
-function updateModeIndicator(nav, index) {
-  const indicator = nav.querySelector('.mode-indicator');
-  const count = modes.length;
-  if (!indicator) return;
-  indicator.style.width = `calc((100% - 8px) / ${count})`;
-  indicator.style.transform = `translateX(calc(${index} * (100% + ${2}px)))`;
-}
-
-export { chrono, minuteur, countdown, alarme, perso };
+export { chrono, minuteur, countdown, alarme };
