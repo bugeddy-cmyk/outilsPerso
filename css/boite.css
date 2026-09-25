@@ -462,6 +462,7 @@ textarea:focus-visible {
 .badge-idea { background: var(--warm-soft); color: var(--warm-text); }
 .badge-scheduled { background: var(--violet-soft); color: var(--violet-text); }
 .badge-archived { background: var(--surface-2); color: var(--text-tertiary); }
+.badge-kind { background: var(--surface-2); color: var(--text-secondary); border: 1px solid var(--border); }
 
 .item-card-title {
   font-size: 1.0625rem;
