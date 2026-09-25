@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ebebf0">
+  <meta name="description" content="Capture d'idées et boîte de réception — interface calme, pleine largeur">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+  <title>Boîte à idées</title>
+  <link rel="stylesheet" href="css/boite.css?v=1">
+</head>
+<body>
+  <div class="desk-app" id="deskApp">
+    <aside class="desk-sidebar" aria-label="Navigation principale">
+      <div class="sidebar-top">
+        <a href="index.html" class="sidebar-back">← Horizon minuteur</a>
+        <p class="sidebar-app-name">Boîte à idées</p>
+      </div>
+      <nav class="sidebar-nav" id="sidebarNav">
+        <button type="button" class="nav-item active" data-view="capture" id="nav-capture">
+          <span class="nav-label">Capture</span>
+          <span class="nav-desc">Déposer une pensée</span>
+        </button>
+        <button type="button" class="nav-item" data-view="boite" id="nav-boite">
+          <span class="nav-label">Boîte</span>
+          <span class="nav-desc">Trier et organiser</span>
+        </button>
+        <button type="button" class="nav-item" data-view="maintenant" id="nav-maintenant">
+          <span class="nav-label">Maintenant</span>
+          <span class="nav-desc">Selon ton énergie</span>
+        </button>
+      </nav>
+      <p class="sidebar-foot">Tu restes décisionnaire — rien n'est imposé.</p>
+    </aside>
+
+    <div class="desk-body">
+      <header class="desk-toolbar">
+        <div class="toolbar-titles">
+          <h1 class="toolbar-title" id="viewTitle">Capture</h1>
+          <p class="toolbar-subtitle" id="viewSubtitle">Capture une idée avant de l'oublier</p>
+        </div>
+      </header>
+
+      <main class="desk-main">
+        <!-- CAPTURE -->
+        <section class="view-panel active" id="view-capture" data-view="capture">
+          <div class="capture-layout">
+            <form class="capture-card" id="captureForm">
+              <label class="mac-field capture-field">
+                <span class="mac-label">Qu'as-tu en tête ?</span>
+                <input type="text" class="mac-input capture-hero-input" id="captureTitle" placeholder="Une phrase suffit…" maxlength="280" autocomplete="off" required>
+              </label>
+              <p class="capture-hint">Entrée pour enregistrer · tu pourras trier plus tard</p>
+              <details class="capture-details" id="captureDetailsBlock">
+                <summary>Détails facultatifs</summary>
+                <div class="details-grid">
+                  <label class="mac-field">
+                    <span class="mac-label">Type</span>
+                    <select class="mac-input" id="captureKind">
+                      <option value="other">Autre</option>
+                      <option value="idea">Idée</option>
+                      <option value="task">Tâche</option>
+                      <option value="reminder">Rappel</option>
+                      <option value="note">Note</option>
+                    </select>
+                  </label>
+                  <label class="mac-field">
+                    <span class="mac-label">Effort</span>
+                    <select class="mac-input" id="captureEffort">
+                      <option value="unknown">Inconnu</option>
+                      <option value="quick">Rapide</option>
+                      <option value="focus">Concentration</option>
+                      <option value="creative">Créatif</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </label>
+                  <label class="mac-field span-2">
+                    <span class="mac-label">Détails</span>
+                    <textarea class="mac-input mac-textarea" id="captureDetails" rows="3" maxlength="2000"></textarea>
+                  </label>
+                  <label class="mac-field">
+                    <span class="mac-label">Date</span>
+                    <input type="date" class="mac-input" id="captureDue">
+                  </label>
+                  <label class="mac-field">
+                    <span class="mac-label">Catégorie</span>
+                    <input type="text" class="mac-input" id="captureCategory" maxlength="60" autocomplete="off">
+                  </label>
+                </div>
+              </details>
+              <div class="capture-actions">
+                <button type="submit" class="mac-btn mac-btn-primary">Enregistrer</button>
+              </div>
+            </form>
+
+            <aside class="capture-side">
+              <h2 class="side-title">Récemment</h2>
+              <ul class="mac-list" id="captureRecentList" aria-label="Captures récentes"></ul>
+              <p class="empty-copy" id="captureRecentEmpty">Rien pour l'instant — c'est OK</p>
+            </aside>
+          </div>
+        </section>
+
+        <!-- BOÎTE -->
+        <section class="view-panel" id="view-boite" data-view="boite" hidden>
+          <div class="boite-toolbar-row">
+            <label class="search-wrap">
+              <span class="visually-hidden">Rechercher</span>
+              <input type="search" class="mac-input search-input" id="inboxSearch" placeholder="Rechercher…" autocomplete="off">
+            </label>
+            <div class="segmented" id="inboxStatusFilters" role="group" aria-label="Filtrer par statut">
+              <button type="button" class="segment active" data-status="inbox">À trier</button>
+              <button type="button" class="segment" data-status="todo">À faire</button>
+              <button type="button" class="segment" data-status="idea">Idées</button>
+              <button type="button" class="segment" data-status="scheduled">Planifiés</button>
+              <button type="button" class="segment" data-status="archived">Archivés</button>
+              <button type="button" class="segment" data-status="all">Tout</button>
+            </div>
+          </div>
+          <div class="card-grid" id="inboxList" role="list" aria-label="Éléments"></div>
+          <p class="empty-copy empty-wide" id="inboxEmpty">Rien à trier pour le moment</p>
+        </section>
+
+        <!-- MAINTENANT -->
+        <section class="view-panel" id="view-maintenant" data-view="maintenant" hidden>
+          <div class="now-layout">
+            <div class="now-mood">
+              <div class="mood-card">
+                <h2 class="mood-heading">Énergie du moment</h2>
+                <div class="mood-options" id="energyGroup" role="group" aria-label="Niveau d'énergie"></div>
+              </div>
+              <div class="mood-card">
+                <h2 class="mood-heading">Concentration</h2>
+                <div class="mood-options" id="focusGroup" role="group" aria-label="Niveau de concentration"></div>
+              </div>
+              <label class="mac-check">
+                <input type="checkbox" id="highlightCompat" checked>
+                <span>Mettre en avant les éléments compatibles</span>
+              </label>
+              <p class="mood-note">Indication personnelle, pas un diagnostic. Tu peux aussi ne rien choisir.</p>
+            </div>
+            <div class="now-content">
+              <div class="suggest-panel" id="suggestCard" hidden>
+                <p class="suggest-kicker">Une proposition parmi d'autres</p>
+                <h3 class="suggest-title" id="suggestTitle"></h3>
+                <p class="suggest-meta" id="suggestMeta"></p>
+                <div class="suggest-btns">
+                  <button type="button" class="mac-btn mac-btn-secondary" id="suggestAnother">Autre idée</button>
+                  <button type="button" class="mac-btn mac-btn-primary" id="suggestOpen">Ouvrir</button>
+                </div>
+              </div>
+              <h2 class="side-title">Éléments compatibles</h2>
+              <ul class="mac-list mac-list-interactive" id="nowList"></ul>
+              <p class="empty-copy" id="nowEmpty">Rien de pressant ici</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <nav class="mobile-tabbar" id="mobileTabbar" aria-label="Navigation mobile">
+    <button type="button" class="tabbar-btn active" data-view="capture">Capture</button>
+    <button type="button" class="tabbar-btn" data-view="boite">Boîte</button>
+    <button type="button" class="tabbar-btn" data-view="maintenant">Maintenant</button>
+  </nav>
+
+  <dialog class="mac-sheet" id="itemEditDialog" aria-labelledby="editDialogTitle">
+    <form class="sheet-form" id="itemEditForm" method="dialog">
+      <header class="sheet-header">
+        <h2 id="editDialogTitle">Modifier</h2>
+        <button type="button" class="mac-btn mac-btn-ghost" id="editClose" aria-label="Fermer">Fermer</button>
+      </header>
+      <div class="sheet-body">
+        <label class="mac-field">
+          <span class="mac-label">Titre</span>
+          <input type="text" class="mac-input" id="editTitle" required maxlength="280">
+        </label>
+        <div class="details-grid">
+          <label class="mac-field">
+            <span class="mac-label">Type</span>
+            <select class="mac-input" id="editKind">
+              <option value="other">Autre</option>
+              <option value="idea">Idée</option>
+              <option value="task">Tâche</option>
+              <option value="reminder">Rappel</option>
+              <option value="note">Note</option>
+            </select>
+          </label>
+          <label class="mac-field">
+            <span class="mac-label">Statut</span>
+            <select class="mac-input" id="editStatus">
+              <option value="inbox">À trier</option>
+              <option value="todo">À faire</option>
+              <option value="idea">Idée gardée</option>
+              <option value="scheduled">Planifié</option>
+              <option value="archived">Archivé</option>
+            </select>
+          </label>
+          <label class="mac-field span-2">
+            <span class="mac-label">Effort</span>
+            <select class="mac-input" id="editEffort">
+              <option value="unknown">Inconnu</option>
+              <option value="quick">Rapide</option>
+              <option value="focus">Concentration</option>
+              <option value="creative">Créatif</option>
+              <option value="admin">Admin</option>
+            </select>
+          </label>
+          <label class="mac-field span-2">
+            <span class="mac-label">Détails</span>
+            <textarea class="mac-input mac-textarea" id="editDetails" rows="4" maxlength="2000"></textarea>
+          </label>
+          <label class="mac-field">
+            <span class="mac-label">Date</span>
+            <input type="date" class="mac-input" id="editDue">
+          </label>
+          <label class="mac-field">
+            <span class="mac-label">Catégorie</span>
+            <input type="text" class="mac-input" id="editCategory" maxlength="60">
+          </label>
+        </div>
+      </div>
+      <footer class="sheet-footer">
+        <button type="button" class="mac-btn mac-btn-secondary" id="editCancel">Annuler</button>
+        <button type="submit" class="mac-btn mac-btn-primary" value="save">Enregistrer</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <div class="boite-toast" id="boiteToast" role="status" aria-live="polite" hidden></div>
+
+  <script type="module" src="js/boite-app.js?v=1"></script>
+</body>
+</html>
