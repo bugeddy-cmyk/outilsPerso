@@ -7,7 +7,9 @@
  *   original — créé pour cette application
  */
 
-export const PHRASES = [
+import { PHRASES_EXTRA } from './phrases-data-extra.js';
+
+const PHRASES_BASE = [
   {
     id: 'fr-rest-001',
     textOriginal: 'Tu n’as pas à tout faire aujourd’hui. Une petite chose suffit parfois.',
@@ -463,6 +465,8 @@ export const PHRASES = [
     source: 'Horizon — collection locale',
   },
 ];
+
+export const PHRASES = [...PHRASES_BASE, ...PHRASES_EXTRA];
 
 export const CATEGORY_LABELS = {
   motivation: 'Motivation',
