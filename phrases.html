@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ebebf0">
+  <meta name="description" content="Phrases inspirantes, drôles et apaisantes — plusieurs langues et cultures">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
+  <title>Phrases — Horizon</title>
+  <link rel="stylesheet" href="css/boite.css?v=4">
+  <link rel="stylesheet" href="css/phrases.css?v=1">
+  <script>
+    (function () {
+      try {
+        var raw = localStorage.getItem('horizon-timer');
+        var pref = raw ? JSON.parse(raw).theme : 'auto';
+        var resolved = pref;
+        if (resolved === 'auto') {
+          resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.dataset.theme = resolved;
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.content = resolved === 'dark' ? '#1e1e1e' : '#ebebf0';
+      } catch (e) { document.documentElement.dataset.theme = 'light'; }
+    })();
+  </script>
+</head>
+<body>
+  <div class="desk-app">
+    <aside class="desk-sidebar" aria-label="Navigation">
+      <div class="sidebar-top">
+        <a href="index.html" class="sidebar-back">← Horizon minuteur</a>
+        <a href="boite.html" class="sidebar-back sidebar-back-secondary">Boîte à idées</a>
+        <p class="sidebar-app-name">Phrases</p>
+      </div>
+      <nav class="sidebar-nav">
+        <button type="button" class="nav-item phrases-nav-item tone-purple active" data-view="phrase" id="nav-phrase">
+          <span class="nav-label">Phrase</span>
+          <span class="nav-desc">Une à la fois</span>
+        </button>
+        <button type="button" class="nav-item phrases-nav-item tone-purple" data-view="favorites" id="nav-favorites">
+          <span class="nav-label">Favoris</span>
+          <span class="nav-desc">Revoir à volonté</span>
+        </button>
+        <button type="button" class="nav-item phrases-nav-item tone-purple" data-view="settings" id="nav-settings">
+          <span class="nav-label">Réglages</span>
+          <span class="nav-desc">Cycle et progression</span>
+        </button>
+      </nav>
+      <p class="sidebar-foot">Sans pression — une nouvelle phrase quand tu veux.</p>
+    </aside>
+
+    <div class="desk-body">
+      <header class="desk-toolbar toolbar-tone-purple">
+        <div class="toolbar-titles">
+          <h1 class="toolbar-title" id="viewTitle">Phrases</h1>
+          <p class="toolbar-subtitle" id="viewSubtitle">Une inspiration à la fois</p>
+        </div>
+        <div class="toolbar-actions">
+          <button type="button" class="theme-toggle" id="themeToggle" aria-label="Passer en mode clair ou sombre">
+            <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+            </svg>
+            <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <main class="desk-main phrases-main-layout">
+        <section class="phrases-panel active" data-view="phrase" id="panel-phrase">
+          <article class="phrase-card" id="phraseCard" aria-live="polite" aria-atomic="true">
+            <span class="phrase-category mac-tag tone-purple" id="phraseCategory" hidden></span>
+            <blockquote class="phrase-original" id="phraseOriginal" cite=""></blockquote>
+            <div class="phrase-translation-wrap" id="phraseTranslationWrap" hidden>
+              <p class="phrase-translation-label">Traduction française</p>
+              <p class="phrase-translation" id="phraseTranslation"></p>
+            </div>
+            <div class="phrase-meta" id="phraseMeta"></div>
+            <div class="phrase-actions">
+              <button type="button" class="mac-btn mac-btn-primary" id="newPhraseBtn">Nouvelle phrase</button>
+              <button type="button" class="mac-btn mac-btn-secondary" id="favoriteBtn" aria-pressed="false">Ajouter aux favoris</button>
+            </div>
+          </article>
+
+          <p class="phrase-progress" id="phraseProgress" aria-live="polite"></p>
+
+          <div class="exhausted-card" id="exhaustedState" hidden>
+            <h2>Tu as parcouru toutes les phrases disponibles</h2>
+            <p>Tu peux recommencer un cycle ou explorer tes favorites.</p>
+            <div class="exhausted-actions">
+              <button type="button" class="mac-btn mac-btn-primary" id="exhaustedRestart">Recommencer</button>
+              <button type="button" class="mac-btn mac-btn-secondary" id="exhaustedFavorites">Voir mes favorites</button>
+            </div>
+          </div>
+
+          <p class="empty-copy" id="phraseEmpty" hidden>Aucune phrase à afficher pour le moment.</p>
+        </section>
+
+        <section class="phrases-panel" data-view="favorites" id="panel-favorites" hidden>
+          <ul class="favorites-list" id="favoritesList"></ul>
+          <p class="empty-copy" id="favoritesEmpty">Aucune favorite pour l’instant</p>
+        </section>
+
+        <section class="phrases-panel" data-view="settings" id="panel-settings" hidden>
+          <div class="settings-card">
+            <h2 class="form-title">Progression</h2>
+            <p id="settingsProgress"></p>
+            <button type="button" class="mac-btn mac-btn-secondary" id="settingsRestart">Recommencer le cycle</button>
+            <p class="mood-note" style="margin-top:12px">Efface uniquement l’historique des phrases vues. Les favoris restent.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <nav class="mobile-tabbar" aria-label="Navigation mobile">
+    <button type="button" class="tabbar-btn phrases-tab-btn tone-purple active" data-view="phrase">Phrase</button>
+    <button type="button" class="tabbar-btn phrases-tab-btn tone-purple" data-view="favorites">Favoris</button>
+    <button type="button" class="tabbar-btn phrases-tab-btn tone-purple" data-view="settings">Réglages</button>
+  </nav>
+
+  <div class="boite-toast" id="boiteToast" role="status" aria-live="polite" hidden></div>
+
+  <script type="module" src="js/phrases-app.js?v=1"></script>
+</body>
+</html>

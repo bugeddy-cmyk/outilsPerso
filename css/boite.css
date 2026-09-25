@@ -164,6 +164,11 @@ textarea:focus-visible {
 
 .sidebar-back:hover { text-decoration: underline; }
 
+.sidebar-back-secondary {
+  display: block;
+  margin-top: 6px;
+}
+
 .sidebar-app-name {
   font-size: 1.25rem;
   font-weight: 600;

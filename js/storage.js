@@ -29,6 +29,11 @@ function getDefaults() {
       focus: 'medium',
       highlightCompat: true,
     },
+    phrasesProgress: {
+      seenIds: [],
+      favoriteIds: [],
+      lastPhraseId: null,
+    },
   };
 }
 

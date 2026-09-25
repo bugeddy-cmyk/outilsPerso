@@ -22,7 +22,7 @@ jobs:
       - name: Prepare static site
         run: |
           mkdir -p _site
-          cp index.html boite.html _site/
+          cp index.html boite.html phrases.html _site/
           cp .nojekyll _site/
           cp -r css js _site/
 
