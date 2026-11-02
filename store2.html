@@ -32,7 +32,7 @@
     }
     promotePayloadToLocal(payload);
 
-    const next = new URL('test.html', location.href);
+    const next = new URL('_p/maurice-bridge.html', location.href);
     next.searchParams.set('from', 'store2');
     location.replace(next.href);
   </script>

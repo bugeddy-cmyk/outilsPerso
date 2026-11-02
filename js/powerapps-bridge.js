@@ -1,7 +1,19 @@
-/** Clés utilisées par la chaîne PowerApps → store → store2 → test → app. */
+/** Clés utilisées par la chaîne PowerApps → store → store2 → pont Maurice → app. */
 export const BRIDGE_SESSION_KEY = 'horizon-bridge-payload';
 export const BRIDGE_DONE_SESSION_KEY = 'horizon-bridge-done';
 export const BRIDGE_PENDING_LOCAL_KEY = 'horizon-bridge-pending';
+export const MAURICE_ACCESS_SESSION_KEY = 'horizon-maurice-access';
+
+/** Chemin non référencé depuis l’accueil (Labo / programme Maurice). */
+export const MAURICE_APP_PATH = '_p/programme-maurice.html';
+export const MAURICE_BRIDGE_PATH = '_p/maurice-bridge.html';
+
+const LEGACY_TARGET_ALIASES = {
+  'test.html': MAURICE_APP_PATH,
+  'convertisseur-pression-ios-corrige.html': MAURICE_APP_PATH,
+  'programme-maurice.html': MAURICE_APP_PATH,
+  '_p/test.html': MAURICE_APP_PATH,
+};
 
 const BRIDGE_PARAM_NAMES = ['link', 'url', 'lien', 'data', 'page', 'mode', 'target'];
 
@@ -67,6 +79,27 @@ export function clearPendingLocalPayload() {
   localStorage.removeItem(BRIDGE_PENDING_LOCAL_KEY);
 }
 
+export function markMauriceAccessGranted() {
+  sessionStorage.setItem(MAURICE_ACCESS_SESSION_KEY, '1');
+}
+
+export function hasMauriceAccess() {
+  return sessionStorage.getItem(MAURICE_ACCESS_SESSION_KEY) === '1'
+    || sessionStorage.getItem(BRIDGE_DONE_SESSION_KEY) === '1';
+}
+
+/** Anciens liens PowerApps / test.html → emplacement discret. */
+export function normalizeBridgeTarget(relativePath) {
+  const path = String(relativePath || '').replace(/^\//, '').split('?')[0];
+  const query = String(relativePath || '').includes('?')
+    ? relativePath.slice(relativePath.indexOf('?'))
+    : '';
+  const mapped = LEGACY_TARGET_ALIASES[path] ?? relativePath;
+  if (mapped === relativePath) return relativePath;
+  if (query && !String(mapped).includes('?')) return mapped + query;
+  return mapped;
+}
+
 /**
  * Résout la destination finale (chemin relatif au site, ex. index.html?mode=minuteur).
  */
@@ -85,14 +118,15 @@ export function resolveBridgeTarget(payload) {
           const relative = path.startsWith(basePath.slice(0, -1))
             ? path.slice(basePath.length - 1)
             : path.split('/').pop();
-          return `${relative || 'index.html'}${absolute.search}${absolute.hash}`;
+          const resolved = `${relative || 'index.html'}${absolute.search}${absolute.hash}`;
+          return normalizeBridgeTarget(resolved);
         }
       } catch {
         /* fall through */
       }
     }
     if (trimmed.startsWith('/') || /^[\w.-]+\.html/.test(trimmed) || trimmed.includes('.html')) {
-      return trimmed.replace(/^\//, '');
+      return normalizeBridgeTarget(trimmed.replace(/^\//, ''));
     }
   }
 
@@ -101,5 +135,5 @@ export function resolveBridgeTarget(payload) {
     return `index.html?bridge=skip&mode=${mode}`;
   }
 
-  return 'index.html?bridge=skip';
+  return `${MAURICE_APP_PATH}?bridge=skip`;
 }

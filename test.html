@@ -3,40 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <title>Horizon — redirection</title>
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      font-family: system-ui, sans-serif;
-      background: #0a0a12;
-      color: #e8e8f0;
-    }
-  </style>
+  <meta http-equiv="refresh" content="0;url=index.html">
+  <title>Horizon</title>
+  <script>location.replace('index.html');</script>
 </head>
-<body>
-  <p>Redirection…</p>
-  <script type="module">
-    import {
-      readPendingLocalPayload,
-      clearPendingLocalPayload,
-      resolveBridgeTarget,
-      parseIncomingLink,
-    } from './js/powerapps-bridge.js';
-
-    const params = new URLSearchParams(location.search);
-    let payload = readPendingLocalPayload();
-
-    if (!payload && params.get('from') !== 'store2') {
-      payload = parseIncomingLink(location.search);
-    }
-
-    const target = resolveBridgeTarget(payload);
-    clearPendingLocalPayload();
-    location.replace(target);
-  </script>
-</body>
+<body></body>
 </html>
