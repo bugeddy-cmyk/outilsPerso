@@ -1,0 +1,557 @@
+From 14b8927c3a1621fafaeb8b6014eb043061ac7f33 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Mon, 2 Nov 2026 10:59:05 +0000
+Subject: [PATCH] =?UTF-8?q?fix:=20cha=C3=AEne=20PowerApps=20store=20?=
+ =?UTF-8?q?=E2=86=92=20store2=20=E2=86=92=20carte=20(index1)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- store.html redirige vers store2.html au lieu de la racine (404)
+- store2.html redirige vers index1.html (index2 supprimé/renommé)
+- Copie mapPoints → mapPoints2 si data absent de l’URL
+- index1.html : popups besoins PowerApps (rayon, période, agents, UP) + cercles km
+- index.html : point d’entrée Pages vers la carte
+---
+ index.html  |   9 ++
+ index1.html | 378 ++++++++++++++++++++--------------------------------
+ store.html  |  34 +++--
+ store2.html |  38 ++++--
+ 4 files changed, 195 insertions(+), 264 deletions(-)
+ create mode 100644 index.html
+
+diff --git a/index.html b/index.html
+new file mode 100644
+index 0000000..6877e60
+--- /dev/null
++++ b/index.html
+@@ -0,0 +1,9 @@
++<!DOCTYPE html>
++<html lang="fr">
++<head>
++  <meta charset="utf-8">
++  <meta http-equiv="refresh" content="0;url=index1.html">
++  <script>location.replace('index1.html');</script>
++</head>
++<body></body>
++</html>
+diff --git a/index1.html b/index1.html
+index d535756..0fff415 100644
+--- a/index1.html
++++ b/index1.html
+@@ -1,273 +1,177 @@
+ <!DOCTYPE html>
+ <html lang="fr">
+-
+ <head>
+-<meta charset="utf-8">
+-<meta name="viewport" content="width=device-width, initial-scale=1">
+-
+-<title>Carte des bâtiments</title>
+-
+-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+-
+-<style>
+-html,
+-body {
+-    margin: 0;
+-    padding: 0;
+-    width: 100%;
+-    height: 100%;
+-    font-family: Arial, sans-serif;
+-}
+-
+-#map {
+-    width: 100%;
+-    height: 100vh;
+-}
+-
+-.popup-title {
+-    font-size: 15px;
+-    font-weight: bold;
+-    margin-bottom: 8px;
+-}
+-
+-.popup-line {
+-    margin: 4px 0;
+-}
+-</style>
++  <meta charset="utf-8">
++  <meta name="viewport" content="width=device-width, initial-scale=1">
++  <title>Carte des besoins / biens</title>
++  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
++  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
++  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
++  <style>
++    html, body { margin: 0; padding: 0; width: 100%; height: 100%; font-family: system-ui, sans-serif; }
++    #map { width: 100%; height: 100vh; }
++    .popup-title { font-size: 15px; font-weight: bold; margin-bottom: 8px; }
++    .popup-line { margin: 4px 0; }
++  </style>
+ </head>
+-
+ <body>
+-
+ <div id="map"></div>
+-
+ <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+ <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+-
+ <script>
++(function () {
++  var urlParams = new URLSearchParams(window.location.search);
++  var pointsParam = urlParams.get('points') || urlParams.get('data');
+ 
+-/* Récupération des données */
+-
+-const urlParams = new URLSearchParams(window.location.search);
+-
+-let pointsParam = urlParams.get("points");
+-
+-if (!pointsParam) {
+-    pointsParam = localStorage.getItem("mapPoints2");
+-}
+-
+-let points = [];
++  if (!pointsParam) {
++    pointsParam = localStorage.getItem('mapPoints2') || localStorage.getItem('mapPoints');
++  }
+ 
+-if (pointsParam) {
++  var points = [];
++  if (pointsParam) {
+     try {
+-        points = JSON.parse(pointsParam);
+-    } catch (error) {
+-        console.error("Erreur lors de la lecture des données :", error);
++      var raw = pointsParam;
++      if (raw.indexOf('%') !== -1) {
++        try { raw = decodeURIComponent(raw); } catch (e) { /* keep raw */ }
++      }
++      points = JSON.parse(raw);
++    } catch (err) {
++      console.error('Erreur lecture JSON :', err);
+     }
+-}
+-
+-/* Conversion et filtrage des coordonnées */
+-
+-points = points
+-    .map(function(point) {
+-        return {
+-            lat: Number(point.lat),
+-            lng: Number(point.lng),
+-            nom: point.nom || "",
+-            SiteITIF: point.SiteITIF || "",
+-            Immosis: point.Immosis || "",
+-            Actif: point.Actif || "",
+-            Effectif: point.Effectif || "",
+-            Superficie: point.Superficie || ""
+-        };
++  }
++
++  if (!Array.isArray(points)) {
++    points = [];
++  }
++
++  points = points
++    .map(function (p) {
++      return {
++        lat: Number(p.lat),
++        lng: Number(p.lng),
++        nom: p.nom || '',
++        distance: p.distance != null ? Number(p.distance) : 0,
++        duree: p.duree,
++        periode: p.periode || '',
++        nbAgents: p.nbAgents != null ? Number(p.nbAgents) : undefined,
++        up: p.up || '',
++        SiteITIF: p.SiteITIF || '',
++        Immosis: p.Immosis || '',
++        Actif: p.Actif || '',
++        Effectif: p.Effectif || '',
++        Superficie: p.Superficie || '',
++        color: p.color
++      };
+     })
+-    .filter(function(point) {
+-        return Number.isFinite(point.lat) &&
+-               Number.isFinite(point.lng) &&
+-               point.lat >= -90 &&
+-               point.lat <= 90 &&
+-               point.lng >= -180 &&
+-               point.lng <= 180;
++    .filter(function (p) {
++      return Number.isFinite(p.lat) && Number.isFinite(p.lng)
++        && p.lat >= -90 && p.lat <= 90
++        && p.lng >= -180 && p.lng <= 180;
+     });
+ 
+-/* Point de secours */
+-
+-if (points.length === 0) {
+-    points = [
+-        {
+-            lat: 48.8566,
+-            lng: 2.3522,
+-            nom: "Aucun bâtiment transmis"
+-        }
+-    ];
+-}
+-
+-/* Création de la carte */
++  if (points.length === 0) {
++    points = [{ lat: 48.8566, lng: 2.3522, nom: 'Aucun point transmis' }];
++  }
+ 
+-const map = L.map("map", {
+-    preferCanvas: true,
+-    zoomControl: true
+-}).setView(
+-    [points[0].lat, points[0].lng],
+-    10
+-);
+-
+-/* Fond OpenStreetMap */
+-
+-L.tileLayer(
+-    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+-    {
+-        maxZoom: 19,
+-        attribution: "© OpenStreetMap contributors"
++  function escapeHtml(value) {
++    return String(value)
++      .replace(/&/g, '&amp;')
++      .replace(/</g, '&lt;')
++      .replace(/>/g, '&gt;')
++      .replace(/"/g, '&quot;')
++      .replace(/'/g, '&#039;');
++  }
++
++  function getColor(p) {
++    if (p.color) return p.color;
++    if (p.nbAgents >= 10) return '#d73027';
++    if (p.nbAgents >= 5) return '#ff9800';
++    return '#2563EB';
++  }
++
++  function buildPopup(p) {
++    var html = '<div class="popup-title">📍 ' + escapeHtml(p.nom || 'Point') + '</div>';
++
++    if (p.nbAgents !== undefined && !Number.isNaN(p.nbAgents)) {
++      html +=
++        '<div class="popup-line"><b>📏 Rayon :</b> ' + escapeHtml(p.distance || 0) + ' km</div>' +
++        '<div class="popup-line"><b>📅 Période :</b> ' + escapeHtml(p.periode) + '</div>' +
++        '<div class="popup-line"><b>⏱ Durée :</b> ' + escapeHtml(p.duree) + ' jours</div>' +
++        '<div class="popup-line"><b>👷 Agents :</b> ' + escapeHtml(p.nbAgents) + '</div>' +
++        '<div class="popup-line"><b>🏢 UP :</b> ' + escapeHtml(p.up) + '</div>';
+     }
+-).addTo(map);
+ 
+-/* Groupe de clusters */
+-
+-const markers = L.markerClusterGroup({
+-    chunkedLoading: true,
+-    chunkInterval: 100,
+-    chunkDelay: 20,
+-    maxClusterRadius: 50,
+-    showCoverageOnHover: false,
+-    spiderfyOnMaxZoom: true,
+-    removeOutsideVisibleBounds: true
+-});
+-
+-/* Création des icônes */
+-
+-function createIcon() {
+-    return L.divIcon({
+-        className: "custom-marker",
+-        html:
+-            "<div style=\"" +
+-            "background:#2563EB;" +
+-            "width:14px;" +
+-            "height:14px;" +
+-            "border-radius:50%;" +
+-            "border:3px solid white;" +
+-            "box-shadow:0 1px 4px rgba(0,0,0,0.45);" +
+-            "\"></div>",
+-        iconSize: [20, 20],
+-        iconAnchor: [10, 10],
+-        popupAnchor: [0, -10]
+-    });
+-}
+-
+-/* Construction des fenêtres popup */
+-
+-function buildPopup(point) {
+-
+-    let html =
+-        "<div class=\"popup-title\">" +
+-        "📍 " + escapeHtml(point.nom) +
+-        "</div>";
+-
+-    if (point.SiteITIF) {
+-        html +=
+-            "<div class=\"popup-line\">" +
+-            "<b>🏢 Site ITIF :</b> " +
+-            escapeHtml(point.SiteITIF) +
+-            "</div>";
++    if (p.SiteITIF) {
++      html +=
++        '<div class="popup-line"><b>🏢 Site ITIF :</b> ' + escapeHtml(p.SiteITIF) + '</div>';
+     }
+-
+-    if (point.Immosis) {
+-        html +=
+-            "<div class=\"popup-line\">" +
+-            "<b>🆔 IMMOSIS :</b> " +
+-            escapeHtml(point.Immosis) +
+-            "</div>";
++    if (p.Immosis) {
++      html += '<div class="popup-line"><b>🆔 IMMOSIS :</b> ' + escapeHtml(p.Immosis) + '</div>';
+     }
+-
+-    if (point.Actif) {
+-        html +=
+-            "<div class=\"popup-line\">" +
+-            "<b>⚙️ Statut :</b> " +
+-            escapeHtml(point.Actif) +
+-            "</div>";
++    if (p.Actif) {
++      html += '<div class="popup-line"><b>⚙️ Statut :</b> ' + escapeHtml(p.Actif) + '</div>';
+     }
+-
+-    if (point.Effectif) {
+-        html +=
+-            "<div class=\"popup-line\">" +
+-            "<b>👥 Effectif :</b> " +
+-            escapeHtml(point.Effectif) +
+-            "</div>";
++    if (p.Effectif) {
++      html += '<div class="popup-line"><b>👥 Effectif :</b> ' + escapeHtml(p.Effectif) + '</div>';
+     }
+-
+-    if (point.Superficie) {
+-        html +=
+-            "<div class=\"popup-line\">" +
+-            "<b>📐 Superficie :</b> " +
+-            escapeHtml(point.Superficie) +
+-            " m²</div>";
++    if (p.Superficie) {
++      html += '<div class="popup-line"><b>📐 Superficie :</b> ' + escapeHtml(p.Superficie) + ' m²</div>';
+     }
+ 
+     return html;
+-}
+-
+-/* Protection du contenu HTML */
+-
+-function escapeHtml(value) {
+-    return String(value)
+-        .replace(/&/g, "&")
+-        .replace(/</g, "<")
+-        .replace(/>/g, ">")
+-        .replace(/"/g, """)
+-        .replace(/'/g, "&#039;");
+-}
++  }
+ 
+-/* Ajout des bâtiments */
++  var map = L.map('map', { preferCanvas: true, zoomControl: true })
++    .setView([points[0].lat, points[0].lng], 10);
+ 
+-const bounds = [];
++  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
++    maxZoom: 19,
++    attribution: '© OpenStreetMap contributors'
++  }).addTo(map);
+ 
+-points.forEach(function(point) {
+-
+-    const marker = L.marker(
+-        [point.lat, point.lng],
+-        {
+-            icon: createIcon()
+-        }
+-    );
+-
+-    marker.bindPopup(
+-        buildPopup(point),
+-        {
+-            maxWidth: 350,
+-            closeButton: true
+-        }
+-    );
++  var markers = L.markerClusterGroup({
++    chunkedLoading: true,
++    maxClusterRadius: 50,
++    showCoverageOnHover: false,
++    spiderfyOnMaxZoom: true
++  });
++
++  var bounds = [];
++
++  points.forEach(function (p) {
++    var color = getColor(p);
++    var icon = L.divIcon({
++      className: 'custom-marker',
++      html: '<div style="background:' + color + ';width:14px;height:14px;border-radius:50%;border:3px solid white;box-shadow:0 1px 4px rgba(0,0,0,.45);"></div>',
++      iconSize: [20, 20],
++      iconAnchor: [10, 10],
++      popupAnchor: [0, -10]
++    });
+ 
++    var marker = L.marker([p.lat, p.lng], { icon: icon })
++      .bindPopup(buildPopup(p), { maxWidth: 360, closeButton: true });
+     markers.addLayer(marker);
++    bounds.push([p.lat, p.lng]);
++
++    if (p.distance && p.distance > 0) {
++      L.circle([p.lat, p.lng], {
++        radius: p.distance * 1000,
++        color: color,
++        fillColor: color,
++        fillOpacity: 0.12,
++        weight: 2
++      }).addTo(map);
++    }
++  });
+ 
+-    bounds.push([
+-        point.lat,
+-        point.lng
+-    ]);
+-});
+-
+-/* Ajout des marqueurs */
+-
+-map.addLayer(markers);
+-
+-/* Zoom automatique */
+-
+-if (bounds.length === 1) {
+-
+-    map.setView(bounds[0], 15);
+-
+-} else if (bounds.length > 1) {
+-
+-    map.fitBounds(bounds, {
+-        padding: [40, 40],
+-        maxZoom: 16
+-    });
+-}
+-
+-console.log(points.length + " bâtiment(s) chargé(s)");
++  map.addLayer(markers);
+ 
++  if (bounds.length === 1) {
++    map.setView(bounds[0], 12);
++  } else if (bounds.length > 1) {
++    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
++  }
++})();
+ </script>
+-
+ </body>
+ </html>
+diff --git a/store.html b/store.html
+index 5b42519..f9a5080 100644
+--- a/store.html
++++ b/store.html
+@@ -1,22 +1,28 @@
+ <!DOCTYPE html>
+-<html>
++<html lang="fr">
+ <head>
+-<meta charset="utf-8">
++  <meta charset="utf-8">
++  <meta name="viewport" content="width=device-width, initial-scale=1">
++  <title>Chargement…</title>
+ </head>
+ <body>
+-
+ <script>
+-
+-const params = new URLSearchParams(window.location.search);
+-const data = params.get("data");
+-
+-if(data){
+-    localStorage.setItem("mapPoints", data);
+-}
+-
+-window.location.href = "./";
+-
++(function () {
++  var params = new URLSearchParams(window.location.search);
++  var data = params.get('data');
++  if (data) {
++    try {
++      localStorage.setItem('mapPoints', data);
++    } catch (e) {
++      console.error(e);
++    }
++  }
++  var next = new URL('store2.html', window.location.href);
++  if (data) {
++    next.searchParams.set('data', data);
++  }
++  window.location.replace(next.href);
++})();
+ </script>
+-
+ </body>
+ </html>
+diff --git a/store2.html b/store2.html
+index b0b975f..8b54e89 100644
+--- a/store2.html
++++ b/store2.html
+@@ -1,21 +1,33 @@
+ <!DOCTYPE html>
+-<html>
++<html lang="fr">
+ <head>
+-<meta charset="utf-8">
+-<title>Chargement de la carte</title>
++  <meta charset="utf-8">
++  <meta name="viewport" content="width=device-width, initial-scale=1">
++  <title>Chargement de la carte…</title>
+ </head>
+ <body>
+-
+ <script>
+-const params = new URLSearchParams(window.location.search);
+-const data = params.get("data");
+-
+-if (data) {
+-    localStorage.setItem("mapPoints2", data);
+-}
+-
+-window.location.href = "./index2.html";
++(function () {
++  var params = new URLSearchParams(window.location.search);
++  var data = params.get('data');
++  if (data) {
++    try {
++      localStorage.setItem('mapPoints2', data);
++    } catch (e) {
++      console.error(e);
++    }
++  } else {
++    try {
++      var step1 = localStorage.getItem('mapPoints');
++      if (step1) {
++        localStorage.setItem('mapPoints2', step1);
++      }
++    } catch (e) {
++      console.error(e);
++    }
++  }
++  window.location.replace('index1.html');
++})();
+ </script>
+-
+ </body>
+ </html>
+-- 
+2.43.0
+
