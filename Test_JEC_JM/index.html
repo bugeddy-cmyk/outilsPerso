@@ -1,28 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta name="robots" content="noindex, nofollow">
-  <title>Test JEC JM</title>
-  <script>
-    (function () {
-      var search = location.search;
-      if (!search || search.length < 2) return;
-      var params = new URLSearchParams(search);
-      if (params.get('from') === 'store2' || params.get('bridge') === 'skip') return;
-      var bridgeKeys = ['link', 'url', 'lien', 'data', 'page', 'mode', 'target'];
-      for (var i = 0; i < bridgeKeys.length; i++) {
-        if (params.has(bridgeKeys[i])) {
-          location.replace('store.html' + search);
-          return;
-        }
-      }
-    })();
-  </script>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="0;url=index1.html">
+  <script>location.replace('index1.html');</script>
 </head>
-<body>
-  <p>Test JEC JM — utilisez <a href="store.html">store.html</a> depuis PowerApps.</p>
-</body>
+<body></body>
 </html>

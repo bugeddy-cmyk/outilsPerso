@@ -1,41 +1,33 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta name="robots" content="noindex, nofollow">
-  <title>Test JEC JM — validation</title>
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      font-family: system-ui, sans-serif;
-      background: #0a0a12;
-      color: #e8e8f0;
-    }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chargement de la carte…</title>
 </head>
 <body>
-  <p>Validation…</p>
-  <script type="module">
-    import {
-      readSessionPayload,
-      parseIncomingLink,
-      promotePayloadToLocal,
-    } from '../js/powerapps-bridge.js';
-
-    let payload = readSessionPayload();
-    if (!payload) {
-      payload = parseIncomingLink(location.search);
+<script>
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var data = params.get('data');
+  if (data) {
+    try {
+      localStorage.setItem('mapPoints2', data);
+    } catch (e) {
+      console.error(e);
     }
-    promotePayloadToLocal(payload);
-
-    const next = new URL('bridge.html', location.href);
-    next.searchParams.set('from', 'store2');
-    location.replace(next.href);
-  </script>
+  } else {
+    try {
+      var step1 = localStorage.getItem('mapPoints');
+      if (step1) {
+        localStorage.setItem('mapPoints2', step1);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  window.location.replace('index1.html');
+})();
+</script>
 </body>
 </html>
