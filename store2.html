@@ -2,39 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <title>Horizon — validation</title>
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      font-family: system-ui, sans-serif;
-      background: #0a0a12;
-      color: #e8e8f0;
-    }
-  </style>
+  <meta http-equiv="refresh" content="0;url=Test_JEC_JM/store2.html">
+  <script>location.replace('Test_JEC_JM/store2.html' + location.search);</script>
 </head>
-<body>
-  <p>Validation…</p>
-  <script type="module">
-    import {
-      readSessionPayload,
-      parseIncomingLink,
-      promotePayloadToLocal,
-    } from './js/powerapps-bridge.js';
-
-    let payload = readSessionPayload();
-    if (!payload) {
-      payload = parseIncomingLink(location.search);
-    }
-    promotePayloadToLocal(payload);
-
-    const next = new URL('_p/maurice-bridge.html', location.href);
-    next.searchParams.set('from', 'store2');
-    location.replace(next.href);
-  </script>
-</body>
+<body></body>
 </html>

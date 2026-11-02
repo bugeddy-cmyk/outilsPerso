@@ -1,23 +1,29 @@
-/** Clés utilisées par la chaîne PowerApps → store → store2 → pont Maurice → app. */
+/** Pont PowerApps : Test_JEC_JM (store) → NewItem (programme Maurice). */
 export const BRIDGE_SESSION_KEY = 'horizon-bridge-payload';
 export const BRIDGE_DONE_SESSION_KEY = 'horizon-bridge-done';
 export const BRIDGE_PENDING_LOCAL_KEY = 'horizon-bridge-pending';
 export const MAURICE_ACCESS_SESSION_KEY = 'horizon-maurice-access';
 
-/** Chemin non référencé depuis l’accueil (Labo / programme Maurice). */
-export const MAURICE_APP_PATH = '_p/programme-maurice.html';
-export const MAURICE_BRIDGE_PATH = '_p/maurice-bridge.html';
+export const TEST_JEC_JM_DIR = 'Test_JEC_JM';
+export const NEW_ITEM_DIR = 'NewItem';
+
+export const MAURICE_APP_PATH = `${NEW_ITEM_DIR}/programme-maurice.html`;
+export const TEST_JEC_INDEX_PATH = `${TEST_JEC_JM_DIR}/index.html`;
+export const TEST_JEC_STORE_PATH = `${TEST_JEC_JM_DIR}/store.html`;
+export const TEST_JEC_BRIDGE_PATH = `${TEST_JEC_JM_DIR}/bridge.html`;
 
 const LEGACY_TARGET_ALIASES = {
   'test.html': MAURICE_APP_PATH,
   'convertisseur-pression-ios-corrige.html': MAURICE_APP_PATH,
   'programme-maurice.html': MAURICE_APP_PATH,
+  '_p/programme-maurice.html': MAURICE_APP_PATH,
   '_p/test.html': MAURICE_APP_PATH,
+  'store.html': TEST_JEC_STORE_PATH,
+  'store2.html': `${TEST_JEC_JM_DIR}/store2.html`,
 };
 
 const BRIDGE_PARAM_NAMES = ['link', 'url', 'lien', 'data', 'page', 'mode', 'target'];
 
-/** Paramètres de requête reconnus comme provenant de PowerApps (lien profond). */
 export function hasBridgeQueryParams(search = location.search) {
   if (!search || search.length <= 1) return false;
   const params = new URLSearchParams(search);
@@ -26,7 +32,6 @@ export function hasBridgeQueryParams(search = location.search) {
   return BRIDGE_PARAM_NAMES.some(name => params.has(name));
 }
 
-/** Lit la query et produit un objet sérialisable pour les étapes suivantes. */
 export function parseIncomingLink(search = location.search) {
   const params = new URLSearchParams(search);
   const link = params.get('link') ?? params.get('url') ?? params.get('lien') ?? params.get('page') ?? null;
@@ -88,7 +93,6 @@ export function hasMauriceAccess() {
     || sessionStorage.getItem(BRIDGE_DONE_SESSION_KEY) === '1';
 }
 
-/** Anciens liens PowerApps / test.html → emplacement discret. */
 export function normalizeBridgeTarget(relativePath) {
   const path = String(relativePath || '').replace(/^\//, '').split('?')[0];
   const query = String(relativePath || '').includes('?')
@@ -100,9 +104,7 @@ export function normalizeBridgeTarget(relativePath) {
   return mapped;
 }
 
-/**
- * Résout la destination finale (chemin relatif au site, ex. index.html?mode=minuteur).
- */
+/** Destination relative à la racine du site (outilsPerso/). */
 export function resolveBridgeTarget(payload) {
   const params = payload?.raw ?? {};
   const explicit = payload?.link ?? params.page ?? params.target ?? null;
@@ -111,21 +113,23 @@ export function resolveBridgeTarget(payload) {
     if (trimmed.includes('://')) {
       try {
         const absolute = new URL(trimmed);
-        const siteRoot = new URL('.', location.href);
+        const siteRoot = new URL('/', location.href);
         if (absolute.origin === siteRoot.origin) {
-          const path = absolute.pathname.replace(/^\/+/, '');
-          const basePath = siteRoot.pathname.replace(/[^/]*$/, '');
-          const relative = path.startsWith(basePath.slice(0, -1))
-            ? path.slice(basePath.length - 1)
-            : path.split('/').pop();
-          const resolved = `${relative || 'index.html'}${absolute.search}${absolute.hash}`;
+          const sitePath = siteRoot.pathname.replace(/\/$/, '');
+          let pathname = absolute.pathname;
+          if (sitePath && pathname.startsWith(sitePath)) {
+            pathname = pathname.slice(sitePath.length).replace(/^\//, '');
+          } else {
+            pathname = pathname.replace(/^\//, '');
+          }
+          const resolved = `${pathname || 'index.html'}${absolute.search}${absolute.hash}`;
           return normalizeBridgeTarget(resolved);
         }
       } catch {
         /* fall through */
       }
     }
-    if (trimmed.startsWith('/') || /^[\w.-]+\.html/.test(trimmed) || trimmed.includes('.html')) {
+    if (trimmed.startsWith('/') || /^[\w./-]+\.html/.test(trimmed) || trimmed.includes('.html')) {
       return normalizeBridgeTarget(trimmed.replace(/^\//, ''));
     }
   }

@@ -9,21 +9,6 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱</text></svg>">
   <title>Horizon — Minuteur</title>
   <link rel="stylesheet" href="css/app.css?v=6">
-  <script>
-    (function () {
-      var search = location.search;
-      if (!search || search.length < 2) return;
-      var params = new URLSearchParams(search);
-      if (params.get('from') === 'store2' || params.get('bridge') === 'skip') return;
-      var bridgeKeys = ['link', 'url', 'lien', 'data', 'page', 'mode', 'target'];
-      for (var i = 0; i < bridgeKeys.length; i++) {
-        if (params.has(bridgeKeys[i])) {
-          location.replace('store.html' + search);
-          return;
-        }
-      }
-    })();
-  </script>
 </head>
 <body>
   <div class="ambient" aria-hidden="true">

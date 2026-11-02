@@ -23,7 +23,7 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html boite.html phrases.html store.html store2.html test.html _site/
-          cp -r _p _site/
+          cp -r Test_JEC_JM NewItem _site/
           cp .nojekyll _site/
           cp -r css js _site/
 

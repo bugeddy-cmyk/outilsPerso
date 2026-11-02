@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta name="robots" content="noindex, nofollow">
-  <title>Horizon — redirection</title>
+  <title>Test JEC JM — redirection</title>
   <style>
     body {
       margin: 0;
@@ -35,7 +35,7 @@
     let payload = readPendingLocalPayload();
 
     if (!fromStore2 && !payload) {
-      location.replace('../index.html');
+      location.replace('index.html');
     } else {
       if (!payload) {
         payload = parseIncomingLink(location.search);
