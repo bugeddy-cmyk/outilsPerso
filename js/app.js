@@ -109,10 +109,19 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
   if (getTheme() === 'auto') applyTheme('auto');
 });
 
+function applyBridgeModeFromQuery() {
+  const params = new URLSearchParams(location.search);
+  const mode = params.get('mode');
+  if (!mode || !modes.includes(mode)) return;
+  const index = modes.indexOf(mode);
+  switchMode(mode, index);
+}
+
 initTheme();
 initModeNav();
 initKeyboard();
 initParallax();
 initMicroAnimations();
+applyBridgeModeFromQuery();
 
 export { chrono, minuteur, countdown, alarme };
